@@ -21,6 +21,7 @@
 #include <vtkLineSource.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
+#include <vtkCaptionActor2D.h>
 
 #include "Robot.h"
 

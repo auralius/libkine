@@ -66,13 +66,13 @@ private:
     joint_t m_type;
 
     /**
-     * Global Homogenous transformation matrix, in global coordinate 
+     * Global Homogeneous transformation matrix, in global coordinate
      * frame.
      */
     mat m_A;
 
     /**
-     * Local Homogenous transformation matrix, in local body coordinate
+     * Local Homogeneous transformation matrix, in local body coordinate
      * frame.
      */
     mat m_Alocal;

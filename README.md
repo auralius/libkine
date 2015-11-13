@@ -9,7 +9,9 @@ Feature:
 
  * [ ] Screw theory
 
- * [ ] Rigid body velocity
+ * [ ] Rigid body velocity / jacobian
+
+ * [ ]
 
 Dependencies:
 

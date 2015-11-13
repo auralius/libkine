@@ -3,7 +3,6 @@
 //
 
 #include "Graphic.h"
-#include <vtkCaptionActor2D.h>
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -101,7 +100,7 @@ Graphic::Graphic(Robot *robot) {
 
     // Camera
     vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
-    camera->SetPosition(0, -1, 0);
+    camera->SetPosition(0, -2, 0);
     camera->SetFocalPoint(0, 0, 0);
     camera->SetViewUp(0, 0, 1);
     m_Ren->SetActiveCamera(camera);
