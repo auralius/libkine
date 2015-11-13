@@ -2,14 +2,17 @@ cmake_minimum_required(VERSION 2.8)
 
 project(libkine)
 
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
+
 add_executable(libkine main.cpp Link.cpp Link.h Robot.cpp Robot.h Graphic.cpp Graphic.h)
+
+if (VTK_LIBRARIES)
+    target_link_libraries(libkine ${VTK_LIBRARIES})
+else ()
+    target_link_libraries(libkine vtkHybrid vtkWidgets)
+endif ()
 
 install(TARGETS libkine RUNTIME DESTINATION bin)
 
-link_directories(/usr/lib)
-
-include_directories(/usr/include /usr/include/qt4 /usr/include/qt4/Qt)
-
-#target_link_libraries(libkine SoQt4 QtOpenGL QtGui QtCore  Xmu Xi Coin GL Xext SM ICE X11 dl pthread armadillo)
-
-target_link_libraries(libkine mgl-wnd mgl GL pthread armadillo)
+target_link_libraries(libkine mgl-wnd mgl pthread armadillo VLCore VLGLUT VLGraphics VLMolecule glut)

@@ -1,62 +1,47 @@
-//////
-//
-// Example 1.4 - Cone And Viewer
-//
-//
-
-
-#include <mgl2/qt.h>
-#include <unistd.h>
-
-#include "Link.h"
 #include "Robot.h"
 #include "Graphic.h"
 
-int draw (mglGraph *gr)
-{
-    mglPoint pnt;
-    pnt = mglPoint(2*mgl_rnd()-1,2*mgl_rnd()-1, 2*mgl_rnd());
-    gr->Line(mglPoint(0,0,0),mglPoint(1, 1,1));
+int running = 1;
+
+void *simulation(void *ptr) {
+    Robot *puma = (Robot *) ptr;
+
+    double x = 0;
+    while (running) {
+
+        puma->SetTheta(2, x);
+        puma->Update();
+        x = x + .01;
+        usleep(10000);
+    }
+
+    cout << "bye\n";
 }
 
+int main(int, char **argv) {
+    double d2 = 243.5 / 1000.0;
+    double d3 = -93.4 / 1000.0;
+    double a2 = 431.8 / 1000.0;
+    double a3 = -20.3 / 1000.0;
+    double d4 = 433.1 / 1000.0;
 
-int main(int, char **argv)
-{
-  //      a,      alpha,   d,       theta, type
-  
-//   Link l1(0,      -M_PI_2, 0,       0,     Link::REVOLUTE);
-//   Link l2(0.4318, 0,       0.14909, 0,     Link::REVOLUTE);
-//   Link l3(0.023,  M_PI_2,  0,       0,     Link::REVOLUTE);
-//   Link l4(0,      -M_PI_2, 0.43307, 0,     Link::REVOLUTE);
-//   Link l5(0,      M_PI_2,  0,       0,     Link::REVOLUTE);
-//   Link l6(0,      0,       0.05625, 0,     Link::REVOLUTE);
-//   
-  
-  Link l1(0,      0,       0,       0,     Link::REVOLUTE);
-  Link l2(0.5,    0,       0,       0,     Link::REVOLUTE);
-  Link l3(0.5,    0,       -0.5,       0,     Link::REVOLUTE);
-  
+    Robot puma;
+    //      a, alpha, d, theta, type
+    puma.AddLink(0, 0, 0, 0, Link::REVOLUTE);
+    puma.AddLink(0, -M_PI_2, d2, 0, Link::REVOLUTE);
+    puma.AddLink(a2, 0, d3, 0, Link::REVOLUTE);
+    puma.AddLink(a3, M_PI_2, d4, 0, Link::REVOLUTE);
+    puma.AddLink(0, -M_PI_2, 0, 0, Link::REVOLUTE);
+    puma.AddLink(0, M_PI_2, 0, 0, Link::REVOLUTE);
 
-  Robot puma;
-  puma.AddLink(l1);
-  puma.AddLink(l2);
-  puma.AddLink(l3);
-//   puma.AddLink(l4);
-//   puma.AddLink(l5);
-//   puma.AddLink(l6);
-  
-  Graphic G(&puma);
-  
-  
+    pthread_t thread;
+    int ret = pthread_create(&thread, NULL, simulation, (void *) &puma);
 
+    Graphic G(&puma);
+    G.SetGraphicScaling(0.05);
+    G.Run();  // Blocks here until VTK GUI is closed
 
+    running = 0;
+    pthread_join(thread, NULL);
 
-   // mglQT gr(draw,"MathGL examples");
-   // return gr.Run();
-
-  
-  
- 
-  // return 0;
-  
 }
