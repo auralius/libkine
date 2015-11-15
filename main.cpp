@@ -9,7 +9,7 @@ void *simulation(void *ptr) {
     double x = 0;
     while (running) {
 
-        puma->SetTheta(2, x);
+        puma->SetTheta(1, x);
         puma->Update();
         x = x + .01;
         usleep(10000);
@@ -26,19 +26,23 @@ int main(int, char **argv) {
     double d4 = 433.1 / 1000.0;
 
     Robot puma;
+    puma.SetBaseSTLFileName("/home/manurunga/Documents/GIT/libkine/model/puma/base.STL");
+    //, "/home/manurunga/Documents/GIT/libkine/model/puma/link3.STL"
+    //, "/home/manurunga/Documents/GIT/libkine/model/puma/link4.STL"
     //      a, alpha, d, theta, type
-    puma.AddLink(0, 0, 0, 0, Link::REVOLUTE);
-    puma.AddLink(0, -M_PI_2, d2, 0, Link::REVOLUTE);
-    puma.AddLink(a2, 0, d3, 0, Link::REVOLUTE);
-    puma.AddLink(a3, M_PI_2, d4, 0, Link::REVOLUTE);
-    puma.AddLink(0, -M_PI_2, 0, 0, Link::REVOLUTE);
+    puma.AddLink(0, 0, 0, 0, Link::REVOLUTE, "/home/manurunga/Documents/GIT/libkine/model/puma/link1.STL");
+    puma.AddLink(0, -M_PI_2, d2, 0, Link::REVOLUTE, "/home/manurunga/Documents/GIT/libkine/model/puma/link2.STL");
+    puma.AddLink(a2, 0, d3, 0, Link::REVOLUTE, "/home/manurunga/Documents/GIT/libkine/model/puma/link3.STL");
+    puma.AddLink(0, M_PI_2, d4, 0, Link::REVOLUTE, "/home/manurunga/Documents/GIT/libkine/model/puma/link4.STL");
+    puma.AddLink(0, -M_PI_2, 0, 0, Link::REVOLUTE, "/home/manurunga/Documents/GIT/libkine/model/puma/link5.STL");
     puma.AddLink(0, M_PI_2, 0, 0, Link::REVOLUTE);
 
     pthread_t thread;
     int ret = pthread_create(&thread, NULL, simulation, (void *) &puma);
 
-    Graphic G(&puma);
-    G.SetGraphicScaling(0.05);
+    Graphic G(&puma, "Puma");
+    G.SetGraphicScaling(0.15);
+    G.SetOpacity(0.5);
     G.Run();  // Blocks here until VTK GUI is closed
 
     running = 0;

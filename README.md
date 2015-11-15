@@ -9,9 +9,9 @@ Feature:
 
  * [ ] Screw theory
 
- * [ ] Rigid body velocity / jacobian
+ * [ ] Rigid body velocity / Jacobian
 
- * [ ]
+ * [ ] 3D Visualization with using STL file
 
 Dependencies:
 

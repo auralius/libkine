@@ -22,6 +22,7 @@
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
 #include <vtkCaptionActor2D.h>
+#include <vtkSTLReader.h>
 
 #include "Robot.h"
 
@@ -35,10 +36,14 @@ public:
                          void * vtkNotUsed(callData));
 
 private:
+    vector <vtkSmartPointer<vtkTransform> > m_Transforms;
 
+    void ArmaMatToVTKMat(vtkSmartPointer<vtkMatrix4x4> &to, mat &from);
+    
 public:
     vector<vtkSmartPointer<vtkAxesActor> > *m_AxesActors;
     vector<vtkSmartPointer<vtkLineSource> > *m_LineSources;
+    vector<vtkSmartPointer<vtkActor> > *m_STLActors;
     Robot *m_Robot;
 };
 
@@ -46,11 +51,15 @@ public:
 
 class Graphic {
 public:
-    Graphic(Robot *robot);
+    Graphic(Robot *robot, const char *window_title);
 
     ~Graphic();
 
     void SetGraphicScaling(double K);
+    
+    void SetSTLVisibility(int flag);
+    
+    void SetOpacity(double opacity);
 
     void Run();
 
@@ -59,17 +68,27 @@ private:
 
     void CreateLinks();
 
+    void CreateSTLs();
+    
+    void RenderBase();
+
     Robot *m_Robot;
 
     double m_K;
+    
+    int m_STLVisibility;
+    
+    double m_Opacity;
+    
+    string m_WindowTitle;
 
     vtkRenderer *m_Ren;
     vtkRenderWindow *m_RenWin;
     vtkRenderWindowInteractor *m_Iren;
 
     vector<vtkSmartPointer<vtkAxesActor> > m_AxesActors;
-    vector<vtkSmartPointer<vtkActor> > m_LineActors;
     vector<vtkSmartPointer<vtkLineSource> > m_LineSources;
+    vector<vtkSmartPointer<vtkActor> > m_STLActors;
 };
 
 

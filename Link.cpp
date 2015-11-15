@@ -9,11 +9,10 @@ Link::Link(double a, double alpha, double d, double theta, Link::joint_t type) {
     m_alpha = alpha;
     m_d = d;
     m_theta = theta;
-    m_type = type;
+    m_type = type;       
 }
 
-Link::~Link() {
-
+Link::~Link() {    
 }
 
 void Link::PrintGlobalTransformationMatrix() {
@@ -43,6 +42,9 @@ void Link::SetD(double d) {
     m_d = d;
 }
 
+void Link::SetSTLFileName(const char *fn) {
+    m_STLFileName = fn;
+}
 
 double Link::GetA() {
     return m_a;
@@ -60,14 +62,14 @@ double Link::GetTheta() {
     return m_theta;
 }
 
-void Link::GetRotationMatrix(mat &R) {
+void Link::GetRotation(mat &R) {
     R.set_size(4, 4);
     R << m_A.at(0, 0) << m_A.at(0, 1) << m_A.at(0, 2) << endr
     << m_A.at(1, 0) << m_A.at(1, 1) << m_A.at(1, 2) << endr
     << m_A.at(2, 0) << m_A.at(2, 1) << m_A.at(2, 2) << endr;
 }
 
-void Link::GetTranslationMatrix(mat &T) {
+void Link::GetPosition(mat &T) {
     //m_A.print("A=");
     T.set_size(4, 1);
     T << m_A.at(0, 3) << endr
@@ -75,12 +77,17 @@ void Link::GetTranslationMatrix(mat &T) {
     << m_A.at(2, 3) << endr;
 }
 
-void Link::GetTransformationMatrix(mat &A) {
+void Link::GetTransformation(mat &A) {
     A = m_A;
 }
 
-void Link::GetLocalTransformationMatrix(mat &Alocal) {
+void Link::GetLocalTransformation(mat &Alocal) {
     Alocal = m_Alocal;
 }
 
-
+const char *Link::GetSTLFileName() {
+    if(m_STLFileName.size() == 0)
+        return NULL;
+    
+    return m_STLFileName.c_str();
+}

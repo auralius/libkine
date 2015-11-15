@@ -14,7 +14,7 @@ using namespace arma;
 class Link {
 public:
     enum joint_t {
-        REVOLUTE, PRISMATIC
+        REVOLUTE, PRISMATIC, WELD
     };
 
     Link(double a, double alpha, double d, double theta, joint_t type);
@@ -33,6 +33,8 @@ public:
 
     void SetD(double d);
 
+    void SetSTLFileName(const char *fn);
+
     double GetA();
 
     double GetAlpha();
@@ -42,18 +44,20 @@ public:
     double GetTheta();
 
     /**
-     * In global coordinate frame
+     * In global coordinate frame, measured at the tip
      */
-    void GetRotationMatrix(mat &R);
+    void GetRotation(mat &R);
 
-    void GetTranslationMatrix(mat &T);
+    void GetPosition(mat &T);
 
-    void GetTransformationMatrix(mat &A);
+    void GetTransformation(mat &A);
 
     /**
-    * In local coordinate frame
+    * In local coordinate frame, measured at the tip
     */
-    void GetLocalTransformationMatrix(mat &Alocal);
+    void GetLocalTransformation(mat &Alocal);
+
+    const char *GetSTLFileName();
 
 private:
 
@@ -76,6 +80,8 @@ private:
      * frame.
      */
     mat m_Alocal;
+
+    string m_STLFileName;
 
 
 };

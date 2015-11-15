@@ -4,6 +4,10 @@
 
 #include "Robot.h"
 
+Robot::Robot()
+{
+    
+}
 
 Robot::~Robot() {
     // Cleaning up here;
@@ -13,11 +17,14 @@ Robot::~Robot() {
     m_Links.clear();
 }
 
-void Robot::AddLink(double a, double alpha, double d, double theta, Link::joint_t type) {
+void Robot::AddLink(double a, double alpha, double d, double theta, Link::joint_t type, char * stl_fn) {
     Link *l = new Link(a, alpha, d, theta, type);
     m_Links.push_back(l);
 
     l->SetId(m_Links.size());
+
+    if (stl_fn)
+        l->SetSTLFileName(stl_fn);
 
     mat A;
     CalcTransformationMatrix(*l, A);
@@ -25,7 +32,7 @@ void Robot::AddLink(double a, double alpha, double d, double theta, Link::joint_
 
     if (m_Links.size() > 1) {
         mat A_prev;
-        m_Links.at(m_Links.size() - 2)->GetTransformationMatrix(A_prev);
+        m_Links.at(m_Links.size() - 2)->GetTransformation(A_prev);
         A = A_prev * A;
     }
 
@@ -45,7 +52,7 @@ void Robot::Update() {
         // Here we calculate the global transformation matrix
         if (i > 0) {
             mat A_prev;
-            m_Links.at(i - 1)->GetTransformationMatrix(A_prev);
+            m_Links.at(i - 1)->GetTransformation(A_prev);
             A = A_prev * A;
         }
         l->SetGlobalTransformation(A);
@@ -54,6 +61,11 @@ void Robot::Update() {
 
 void Robot::SetTheta(int n_link, double theta) {
     m_Links.at(n_link)->SetTheta(theta);
+}
+
+void Robot::SetBaseSTLFileName(const char *fn)
+{
+    m_BaseSTLFileName = fn;
 }
 
 vector<Link *> Robot::GetLinks() {
@@ -75,4 +87,53 @@ void Robot::CalcTransformationMatrix(Link &l, mat &A) {
 
 void Robot::SetD(int n_link, double d) {
     m_Links.at(n_link)->SetD(d);
+}
+
+void Robot::GetTipPosition(int n_link, mat &T) {
+    m_Links.at(n_link)->GetPosition(T);
+}
+
+void Robot::GetJointPosition(int n_link, mat &T) {
+    if (n_link > 0)
+        m_Links.at(n_link-1)->GetPosition(T);
+    else
+        T <<  0 << endr << 0 << endr << 0 << endr;        
+}
+
+void Robot::GetTipTransformation(int n_link, mat &A) {
+    m_Links.at(n_link)->GetTransformation(A);
+}
+
+void Robot::GetJointTransformation(int n_link, mat &A) {
+    m_Links.at(n_link)->GetTransformation(A);
+
+    mat p;
+    GetJointPosition(n_link, p);
+
+    for (int i = 0; i < 3; i++)
+        A.at(i,3) = p.at(i,0);
+}
+
+void Robot::GetTipPosition(int n_link, double p[3]) {
+    mat T;
+    GetTipPosition(n_link, T);
+
+    for (int i = 0; i < 3; i++)
+        p[i] = T.at(i, 0);   
+}
+
+void Robot::GetJointPosition(int n_link, double p[3]) {
+    mat T;
+    GetJointPosition(n_link, T);
+
+    for (int i = 0; i < 3; i++)
+        p[i] = T.at(i, 0);        
+}
+
+const char* Robot::GetBaseSTLFileName()
+{
+    if(m_BaseSTLFileName.size() == 0)
+        return NULL;
+    
+    return m_BaseSTLFileName.c_str();
 }
