@@ -15,4 +15,4 @@ endif ()
 
 install(TARGETS libkine RUNTIME DESTINATION bin)
 
-target_link_libraries(libkine mgl-wnd mgl pthread armadillo VLCore VLGLUT VLGraphics VLMolecule glut)
+target_link_libraries(libkine pthread armadillo)
