@@ -11,23 +11,22 @@ vtkTimerCallback *vtkTimerCallback::New() {
     return cb;
 }
 
-void vtkTimerCallback::Execute(vtkObject *caller, unsigned long eventId,
-                               void *vtkNotUsed(callData)) {
+void vtkTimerCallback::Execute(vtkObject *caller, unsigned long eventId, void *vtkNotUsed(callData)) {
     vector<Link *> links = m_Robot->GetLinks();
     vtkSmartPointer<vtkMatrix4x4> vtk_A_tip = vtkSmartPointer<vtkMatrix4x4>::New();
     vtkSmartPointer<vtkMatrix4x4> vtk_A_joint = vtkSmartPointer<vtkMatrix4x4>::New();
     mat A_tip;
     mat A_joint;
 
-    double p0[3] = {0, 0, 0};
-    double p1[3] = {0, 0, 0};
+    double p0[3] = { 0, 0, 0 };
+    double p1[3] = { 0, 0, 0 };
     int stl_indexer = 0;
 
-    for (int i = 0; i < links.size(); i++) {
+    for (size_t i = 0; i < links.size(); i++) {
 
         m_Robot->GetJointTransformation(i, A_joint);
         m_Robot->GetTipTransformation(i, A_tip);
-                
+
         // Axes
         // Armadillo matrix to VTK matrix
         ArmaMatToVTKMat(vtk_A_tip, A_tip);
@@ -47,15 +46,15 @@ void vtkTimerCallback::Execute(vtkObject *caller, unsigned long eventId,
         ls->SetPoint1(p0);
         ls->SetPoint2(p1);
         ls->Update();
-        
+
         // STL
         if (links.at(i)->GetSTLFileName()) {
             vtkSmartPointer<vtkTransform> transform_joint = vtkSmartPointer<vtkTransform>::New();
             transform_joint->PostMultiply();
             transform_joint->SetMatrix(vtk_A_tip);
-            
+
             m_STLActors->at(stl_indexer)->SetUserTransform(transform_joint);
-            stl_indexer = stl_indexer + 1;             
+            stl_indexer = stl_indexer + 1;
         }
     }
 
@@ -66,13 +65,14 @@ void vtkTimerCallback::Execute(vtkObject *caller, unsigned long eventId,
 
 void vtkTimerCallback::ArmaMatToVTKMat(vtkSmartPointer<vtkMatrix4x4> &to, mat &from) {
     for (int r = 0; r < 4; r++)
-        for (int c = 0; c < 4; c++)
-            to->SetElement(r, c, from.at(r, c));
+    for (int c = 0; c < 4; c++)
+        to->SetElement(r, c, from.at(r, c));
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 Graphic::Graphic(Robot *robot, const char *window_title) {
+
     m_K = 0.05;
     m_Robot = robot;
     m_STLVisibility = 1;
@@ -86,7 +86,7 @@ Graphic::Graphic(Robot *robot, const char *window_title) {
     m_Iren->SetRenderWindow(m_RenWin);
 
     m_Ren->SetBackground(.3, .6, .3);
-    m_RenWin->SetSize(600, 600);    
+    m_RenWin->SetSize(600, 600);
     m_RenWin->SetWindowName(m_WindowTitle.c_str());
 }
 
@@ -118,8 +118,7 @@ void Graphic::Run() {
     int timer_id = m_Iren->CreateRepeatingTimer(100);
 
     // Mouse manipulation style
-    vtkSmartPointer<vtkInteractorStyleTrackballCamera> style =
-            vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+    vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     m_Iren->SetInteractorStyle(style);
 
     // Camera
@@ -127,8 +126,8 @@ void Graphic::Run() {
     camera->SetPosition(0, -2, 0);
     camera->SetFocalPoint(0, 0, 0);
     camera->SetViewUp(0, 0, 1);
-    m_Ren->SetActiveCamera(camera);    
-    
+    m_Ren->SetActiveCamera(camera);
+
     m_Iren->Start();
 }
 
@@ -136,20 +135,20 @@ void Graphic::SetGraphicScaling(double K) {
     m_K = K;
 }
 
-void Graphic::SetSTLVisibility(int flag)
-{
+void Graphic::SetSTLVisibility(int flag) {
     m_STLVisibility = flag;
 }
 
-void Graphic::SetOpacity(double opacity)
-{
+void Graphic::SetOpacity(double opacity) {
     m_Opacity = opacity;
 }
 
 
 
 void Graphic::CreateAxes() {
-    for (int i = 0; i < m_Robot->GetLinks().size(); i++) {
+    ostringstream o;
+
+    for (size_t i = 0; i < m_Robot->GetLinks().size(); i++) {
         vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
         m_AxesActors.push_back(axes);
         //axes->AxisLabelsOff();        
@@ -165,26 +164,31 @@ void Graphic::CreateAxes() {
         axes->GetYAxisCaptionActor2D()->GetTextActor()->SetTextScaleMode(m_K);
         axes->GetZAxisCaptionActor2D()->GetTextActor()->SetTextScaleMode(m_K);
 
-        char c[8];
-        sprintf(c, "x%i", i + 1);
-        axes->SetXAxisLabelText(c);
-        sprintf(c, "y%i", i + 1);
-        axes->SetYAxisLabelText(c);
-        sprintf(c, "z%i", i + 1);
-        axes->SetZAxisLabelText(c);
+        o.str("");
+        o << "x" << i;
+        axes->SetXAxisLabelText(o.str().c_str());
+
+        o.str("");  
+        o << "y" << i;
+        axes->SetYAxisLabelText(o.str().c_str());
+
+        o.str("");
+        o << "z" << i;
+        axes->SetZAxisLabelText(o.str().c_str());
 
         m_Ren->AddActor(axes);
     }
 }
 
 void Graphic::CreateLinks() {
-    for (int i = 0; i < m_Robot->GetLinks().size(); i++) {
+    for (size_t i = 0; i < m_Robot->GetLinks().size(); i++) {
         vtkSmartPointer<vtkLineSource> ls = vtkSmartPointer<vtkLineSource>::New();
         m_LineSources.push_back(ls);
 
         // Visualize
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         mapper->SetInputConnection(ls->GetOutputPort());
+
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
         actor->GetProperty()->SetLineWidth(1);
@@ -195,29 +199,26 @@ void Graphic::CreateLinks() {
 }
 
 void Graphic::CreateSTLs() {
-    for (int i = 0; i < m_Robot->GetLinks().size(); i++) {
+    for (size_t i = 0; i < m_Robot->GetLinks().size(); i++) {
         Link *l = m_Robot->GetLinks().at(i);
         const char *fn = l->GetSTLFileName();
-        
+
         if (fn) {
             vtkSmartPointer<vtkSTLReader> reader = vtkSmartPointer<vtkSTLReader>::New();
             reader->SetFileName(fn);
             reader->Update();
-            
+
             // Visualize
-            vtkSmartPointer<vtkPolyDataMapper> mapper =
-                vtkSmartPointer<vtkPolyDataMapper>::New();
+            vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
             mapper->SetInputConnection(reader->GetOutputPort());
-            
-            vtkSmartPointer<vtkActor> actor =
-                vtkSmartPointer<vtkActor>::New();
+
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
             actor->SetMapper(mapper);
-            
-            actor->SetVisibility(m_STLVisibility);            
+            actor->SetVisibility(m_STLVisibility);
             actor->GetProperty()->SetOpacity(m_Opacity);
-            
+
             m_Ren->AddActor(actor);
-                                 
+
             m_STLActors.push_back(actor);
         }
     }
@@ -230,15 +231,16 @@ void Graphic::RenderBase()
         vtkSmartPointer<vtkSTLReader> reader = vtkSmartPointer<vtkSTLReader>::New();
         reader->SetFileName(fn);
         reader->Update();
-        
+
         // Visualize
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         mapper->SetInputConnection(reader->GetOutputPort());
-        
+
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
-        
-        m_Ren->AddActor(actor);                                        
-        }
-}
+        actor->SetVisibility(m_STLVisibility);
+        actor->GetProperty()->SetOpacity(m_Opacity);
 
+        m_Ren->AddActor(actor);
+    }
+}

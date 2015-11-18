@@ -4,14 +4,13 @@
 
 #include "Robot.h"
 
-Robot::Robot()
-{
-    
+Robot::Robot() {
+
 }
 
 Robot::~Robot() {
     // Cleaning up here;
-    for (int i = 0; i < m_Links.size(); i++)
+    for (unsigned int i = 0; i < m_Links.size(); i++)
         delete m_Links.at(i);
 
     m_Links.clear();
@@ -41,7 +40,7 @@ void Robot::AddLink(double a, double alpha, double d, double theta, Link::joint_
 }
 
 void Robot::Update() {
-    for (int i = 0; i < m_Links.size(); i++) {
+    for (unsigned int i = 0; i < m_Links.size(); i++) {
         Link *l = m_Links.at(i);
 
         mat A;
@@ -79,9 +78,9 @@ void Robot::CalcTransformationMatrix(Link &l, mat &A) {
     double d = l.GetD();
 
     A << cos(theta) << -sin(theta) << 0 << a << endr
-    << sin(theta) * cos(alpha) << cos(theta) * cos(alpha) << -sin(alpha) << -sin(alpha) * d << endr
-    << sin(theta) * sin(alpha) << cos(theta) * sin(alpha) << cos(alpha) << cos(alpha) * d << endr
-    << 0 << 0 << 0 << 1 << endr;
+        << sin(theta) * cos(alpha) << cos(theta) * cos(alpha) << -sin(alpha) << -sin(alpha) * d << endr
+        << sin(theta) * sin(alpha) << cos(theta) * sin(alpha) << cos(alpha) << cos(alpha) * d << endr
+        << 0 << 0 << 0 << 1 << endr;
 }
 
 
@@ -89,15 +88,15 @@ void Robot::SetD(int n_link, double d) {
     m_Links.at(n_link)->SetD(d);
 }
 
-void Robot::GetTipPosition(int n_link, mat &T) {
-    m_Links.at(n_link)->GetPosition(T);
+void Robot::GetTipPosition(int n_link, mat &p) {
+    m_Links.at(n_link)->GetPosition(p);
 }
 
-void Robot::GetJointPosition(int n_link, mat &T) {
+void Robot::GetJointPosition(int n_link, mat &p) {
     if (n_link > 0)
-        m_Links.at(n_link-1)->GetPosition(T);
+        m_Links.at(n_link - 1)->GetPosition(p);
     else
-        T <<  0 << endr << 0 << endr << 0 << endr;        
+        p << 0 << endr << 0 << endr << 0 << endr;
 }
 
 void Robot::GetTipTransformation(int n_link, mat &A) {
@@ -111,7 +110,7 @@ void Robot::GetJointTransformation(int n_link, mat &A) {
     GetJointPosition(n_link, p);
 
     for (int i = 0; i < 3; i++)
-        A.at(i,3) = p.at(i,0);
+        A.at(i, 3) = p.at(i, 0);
 }
 
 void Robot::GetTipPosition(int n_link, double p[3]) {
@@ -119,7 +118,7 @@ void Robot::GetTipPosition(int n_link, double p[3]) {
     GetTipPosition(n_link, T);
 
     for (int i = 0; i < 3; i++)
-        p[i] = T.at(i, 0);   
+        p[i] = T.at(i, 0);
 }
 
 void Robot::GetJointPosition(int n_link, double p[3]) {
@@ -127,13 +126,12 @@ void Robot::GetJointPosition(int n_link, double p[3]) {
     GetJointPosition(n_link, T);
 
     for (int i = 0; i < 3; i++)
-        p[i] = T.at(i, 0);        
+        p[i] = T.at(i, 0);
 }
 
-const char* Robot::GetBaseSTLFileName()
-{
-    if(m_BaseSTLFileName.size() == 0)
+const char* Robot::GetBaseSTLFileName() {
+    if (m_BaseSTLFileName.size() == 0)
         return NULL;
-    
+
     return m_BaseSTLFileName.c_str();
 }

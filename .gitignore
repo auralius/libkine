@@ -30,3 +30,13 @@
 .kdev4/
 .idea/
 build/
+Debug/
+Release/
+
+# Visual Studio
+*.sdf
+*.suo
+*.filters
+*.user
+*.opensdf
+

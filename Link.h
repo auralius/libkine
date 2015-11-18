@@ -5,7 +5,6 @@
 #ifndef LIBKINE_LINK_H
 #define LIBKINE_LINK_H
 
-#include <stdio.h>
 #include <armadillo>
 
 using namespace std;
@@ -17,70 +16,89 @@ public:
         REVOLUTE, PRISMATIC, WELD
     };
 
+    // Define the DH-parameters
     Link(double a, double alpha, double d, double theta, joint_t type);
 
     ~Link();
 
+    // Print out the transformation matrix in global coordinate frame
     void PrintGlobalTransformationMatrix();
 
+    // Apply the homogeneous transformation matrix in global coordinate frame 
     void SetGlobalTransformation(mat &T);
 
+    // Apply the homogeneous transformation matrix in local coordinate frame
     void SetLocalTransformation(mat &T);
 
+    // Set the joint id
     void SetId(int id);
 
+    // Provide value for theta (for rotational joint)
     void SetTheta(double theta);
 
+    // Provide value for d (for translational joint)
     void SetD(double d);
 
+    // Provide an STL file
     void SetSTLFileName(const char *fn);
 
+    // Return the joint id
+    int GetJointId();
+
+    // Return a
     double GetA();
 
+    // Return alpha
     double GetAlpha();
 
+    // Return d
     double GetD();
 
+    // Return theta
     double GetTheta();
 
-    /**
-     * In global coordinate frame, measured at the tip
-     */
+    // Get rotation of the tip in global coordinate frame
     void GetRotation(mat &R);
 
+    // Get position of the tip in global coordinate frame
     void GetPosition(mat &T);
 
+    // In global coordinate frame, measured at the tip
     void GetTransformation(mat &A);
 
-    /**
-    * In local coordinate frame, measured at the tip
-    */
-    void GetLocalTransformation(mat &Alocal);
+    // In local coordinate frame, measured at the tip
+    void GetLocalTransformation(mat &Tlocal);
 
+    // Get the file name of the STL file
     const char *GetSTLFileName();
 
 private:
 
-    int m_id;
+    // Joint id
+    int m_Id;
 
-    double m_a;
-    double m_alpha;
-    double m_d;
-    double m_theta;
-    joint_t m_type;
+    // Rotation about the xi-1 axis
+    double m_A;
 
-    /**
-     * Global Homogeneous transformation matrix, in global coordinate
-     * frame.
-     */
-    mat m_A;
+    // Translation along the x_(i-1) axis 
+    double m_Alpha;
 
-    /**
-     * Local Homogeneous transformation matrix, in local body coordinate
-     * frame.
-     */
-    mat m_Alocal;
+    // Translation along the z_i axis
+    double m_D;
 
+    // Joint angle
+    double m_Theta;
+
+    // Joint type
+    joint_t m_Type;
+
+    // Global homogeneous transformation matrix, in global coordinate frame.
+    mat m_T;
+
+    // Local homogeneous transformation matrix, in local body coordinate frame.
+    mat m_Tlocal;
+
+    // 3D model of the link
     string m_STLFileName;
 
 
