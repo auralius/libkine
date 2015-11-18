@@ -80,9 +80,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\Graphic.h" />
     <ClInclude Include="..\Link.h" />
     <ClInclude Include="..\Robot.h" />
