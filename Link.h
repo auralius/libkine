@@ -75,6 +75,9 @@ public:
     // In local coordinate frame, measured at the tip
     void GetLocalTransformation(mat &Tlocal);
 
+    // Return link ID
+    int GetId();
+
     // Get the file name of the STL file
     const char *GetSTLFileName();
 

@@ -48,6 +48,8 @@ public:
     // Set logging file name
     void SetLogFileName(const char *fn);
 
+    void SetBasePosition(double x, double y, double z);
+
     // Get the vector that hold all links together
     vector<Link *> GetLinks();
 
@@ -83,6 +85,9 @@ public:
     // Get the rotation matrix of the end effector;
     void GetEndEffectorRotation(double R[3][3]);
 
+    /// Get base position of the robot
+    void GetBasePosition(double p[3]);
+
 private:
     // Calculate the link transformation matrix, as soon as it is added 
     void CalcTransformationMatrix(Link &l, mat &A);
@@ -108,7 +113,7 @@ private:
     // Stream for data logging
     ofstream m_LoggingStream;
 
-    // Falg for logging
+    // Flag for logging
     int m_DoLogging;
 
 };

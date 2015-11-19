@@ -259,6 +259,10 @@ void Graphic::RenderBase()
         actor->SetVisibility(m_STLVisibility);
         actor->GetProperty()->SetOpacity(m_Opacity);
 
+        double p[3];
+        m_Robot->GetBasePosition(p);
+        actor->SetPosition(p);
+
         m_Ren->AddActor(actor);
     }
 }

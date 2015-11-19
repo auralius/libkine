@@ -33,6 +33,7 @@ int main(int, char **argv) {
 
     Robot puma;
     puma.SetBaseSTLFileName("E:\\GIT\\libkine\\model\\puma\\base.STL");
+    puma.SetBasePosition(-0.10, 0, 0);
 
     //      a, alpha, d, theta, type
     puma.AddLink(0, 0, 0, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link1.STL");
@@ -49,7 +50,7 @@ int main(int, char **argv) {
 
     Graphic G(&puma, "Puma");
     G.SetGraphicScaling(0.15);
-    G.SetOpacity(0.5);
+    G.SetOpacity(0.7);
     G.Run();  // Blocks here until VTK GUI is closed
 
     running = 0;

@@ -107,6 +107,11 @@ void Link::GetLocalTransformation(mat &Alocal) {
     Alocal = m_Tlocal;
 }
 
+int Link::GetId()
+{
+    return m_Id;
+}
+
 const char *Link::GetSTLFileName() {
     if (m_STLFileName.size() == 0)
         return NULL;

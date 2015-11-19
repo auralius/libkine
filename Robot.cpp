@@ -8,6 +8,7 @@ Robot::Robot() {
     m_DoLogging = 0;
     m_SimulationTime = 0;
     m_SimulationRate = 0.001; // 1khz initial sampling rate
+    m_BasePos.zeros(3, 1);
 
     m_LoggingStream << fixed;
     m_LoggingStream << setprecision(5);
@@ -29,7 +30,7 @@ void Robot::AddLink(double a, double alpha, double d, double theta,
     Link *l = new Link(a, alpha, d, theta, type);
     m_Links.push_back(l);
 
-    l->SetId(m_Links.size());
+    l->SetId(m_Links.size()-1);
 
     if (stl_fn)
         l->SetSTLFileName(stl_fn);
@@ -107,6 +108,12 @@ void Robot::SetLogFileName(const char *fn) {
         m_DoLogging = 1;
 }
 
+void Robot::SetBasePosition(double x, double y, double z)
+{
+    m_BasePos.set_size(3, 1);
+    m_BasePos << x << endr << y << endr << z << endr;
+}
+
 vector<Link *> Robot::GetLinks() {
     return m_Links;
 }
@@ -131,6 +138,9 @@ void Robot::CalcTransformationMatrix(Link &l, mat &A) {
         << st * ca << ct * ca << -sa << -sa * d << endr
         << st * sa << ct * sa << ca << ca * d << endr
         << 0 << 0 << 0 << 1 << endr;
+
+    if (l.GetId() == 0)
+        A.submat(0, 3, 2, 3) = A.submat(0, 3, 2, 3) + m_BasePos;
 }
 
 
@@ -185,6 +195,12 @@ void Robot::GetEndEffectorPosition(double p[3]) {
 
 void Robot::GetEndEffectorRotation(double R[3][3]) {
     m_Links.at(m_Links.size() - 1)->GetRotation(R);
+}
+
+void Robot::GetBasePosition(double p[3])
+{
+    for (size_t i = 0; i < 3; i++)
+        p[i] = m_BasePos.at(i, 0);
 }
 
 const char* Robot::GetBaseSTLFileName() {
