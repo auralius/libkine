@@ -61,7 +61,13 @@ public:
     void GetRotation(mat &R);
 
     // Get position of the tip in global coordinate frame
+    void GetRotation(double R[3][3]);
+
+    // Get position of the tip in global coordinate frame
     void GetPosition(mat &T);
+
+    // Get position of the tip in global coordinate frame
+    void GetPosition(double p[3]);
 
     // In global coordinate frame, measured at the tip
     void GetTransformation(mat &A);

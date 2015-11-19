@@ -5,7 +5,12 @@
 #include "Robot.h"
 
 Robot::Robot() {
+    m_DoLogging = 0;
+    m_SimulationTime = 0;
+    m_SimulationRate = 0.001; // 1khz initial sampling rate
 
+    m_LoggingStream << fixed;
+    m_LoggingStream << setprecision(5);
 }
 
 Robot::~Robot() {
@@ -14,9 +19,13 @@ Robot::~Robot() {
         delete m_Links.at(i);
 
     m_Links.clear();
+
+    if (m_LoggingStream.is_open())
+        m_LoggingStream.close();
 }
 
-void Robot::AddLink(double a, double alpha, double d, double theta, Link::joint_t type, char * stl_fn) {
+void Robot::AddLink(double a, double alpha, double d, double theta, 
+    Link::joint_t type, char * stl_fn) {
     Link *l = new Link(a, alpha, d, theta, type);
     m_Links.push_back(l);
 
@@ -36,10 +45,9 @@ void Robot::AddLink(double a, double alpha, double d, double theta, Link::joint_
     }
 
     l->SetGlobalTransformation(A);
-
 }
 
-void Robot::Update() {
+void Robot::Update(int verbose) {
     for (unsigned int i = 0; i < m_Links.size(); i++) {
         Link *l = m_Links.at(i);
 
@@ -56,6 +64,32 @@ void Robot::Update() {
         }
         l->SetGlobalTransformation(A);
     }
+
+    if (verbose) 
+        DoVerbosity();
+
+    m_SimulationTime = m_SimulationTime + m_SimulationRate;
+}
+
+void Robot::DoVerbosity()
+{
+ 
+    double R[3][3];
+    double p[3];
+    GetEndEffectorRotation(R);
+    GetEndEffectorPosition(p);
+
+    m_LoggingStream << "ee_pos\t" << m_SimulationTime << '\t' << p[0] << '\t' 
+        << p[1] << '\t' << p[2] << endl;
+
+    m_LoggingStream << "ee_rot\t" << m_SimulationTime << '\t';
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            m_LoggingStream << R[i][j] << '\t';
+        }
+    }
+    m_LoggingStream << endl;
+
 }
 
 void Robot::SetTheta(int n_link, double theta) {
@@ -67,8 +101,19 @@ void Robot::SetBaseSTLFileName(const char *fn)
     m_BaseSTLFileName = fn;
 }
 
+void Robot::SetLogFileName(const char *fn) {
+    m_LoggingStream.open(fn);
+    if (m_LoggingStream.is_open())
+        m_DoLogging = 1;
+}
+
 vector<Link *> Robot::GetLinks() {
     return m_Links;
+}
+
+void Robot::SetSimulationRate(double rate)
+{
+    m_SimulationRate = rate;
 }
 
 void Robot::CalcTransformationMatrix(Link &l, mat &A) {
@@ -77,9 +122,14 @@ void Robot::CalcTransformationMatrix(Link &l, mat &A) {
     double alpha = l.GetAlpha();
     double d = l.GetD();
 
-    A << cos(theta) << -sin(theta) << 0 << a << endr
-        << sin(theta) * cos(alpha) << cos(theta) * cos(alpha) << -sin(alpha) << -sin(alpha) * d << endr
-        << sin(theta) * sin(alpha) << cos(theta) * sin(alpha) << cos(alpha) << cos(alpha) * d << endr
+    double ct = cos(theta);
+    double st = sin(theta);
+    double ca = cos(alpha);
+    double sa = sin(alpha);
+
+    A << ct << -st << 0 << a << endr
+        << st * ca << ct * ca << -sa << -sa * d << endr
+        << st * sa << ct * sa << ca << ca * d << endr
         << 0 << 0 << 0 << 1 << endr;
 }
 
@@ -127,6 +177,14 @@ void Robot::GetJointPosition(int n_link, double p[3]) {
 
     for (int i = 0; i < 3; i++)
         p[i] = T.at(i, 0);
+}
+
+void Robot::GetEndEffectorPosition(double p[3]) {
+    m_Links.at(m_Links.size() - 1)->GetPosition(p);
+}
+
+void Robot::GetEndEffectorRotation(double R[3][3]) {
+    m_Links.at(m_Links.size() - 1)->GetRotation(R);
 }
 
 const char* Robot::GetBaseSTLFileName() {

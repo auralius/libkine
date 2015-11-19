@@ -8,9 +8,8 @@ void *simulation(void *ptr) {
 
     double x = 0;
     while (running) {
-
         puma->SetTheta(1, x);
-        puma->Update();
+        puma->Update(1);
         x = x + .01;
 #ifdef WIN32
         Sleep(1);
@@ -42,6 +41,8 @@ int main(int, char **argv) {
     puma.AddLink(a3, M_PI_2, d4, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link4.STL");
     puma.AddLink(0, -M_PI_2, 0, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link5.STL");
     puma.AddLink(0, M_PI_2, d6, 0, Link::REVOLUTE);
+
+    puma.SetLogFileName("puma.log");
 
     pthread_t thread;
     int ret = pthread_create(&thread, NULL, simulation, (void *)&puma);

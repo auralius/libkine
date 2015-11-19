@@ -41,10 +41,12 @@ public:
     static vtkTimerCallback *New();
 
     // Callback function to call
-    virtual void Execute(vtkObject *caller, unsigned long eventId, void * vtkNotUsed(callData));
+    virtual void Execute(vtkObject *caller, unsigned long eventId, 
+        void * vtkNotUsed(callData));
 
 private:
-    // A vector contains transformation matrices of all links, stored in ascending order
+    // A vector contains transformation matrices of all links, stored in 
+    // ascending order
     vector <vtkSmartPointer<vtkTransform> > m_Transforms;
 
     // convert armadillo matrix to vtk matrix

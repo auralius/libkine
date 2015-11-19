@@ -4,7 +4,8 @@
 
 #include "Link.h"
 
-Link::Link(double a, double alpha, double d, double theta, Link::joint_t type) {
+Link::Link(double a, double alpha, double d, double theta, Link::joint_t type) 
+{
     m_A = a;
     m_Alpha = alpha;
     m_D = d;
@@ -16,9 +17,8 @@ Link::~Link() {
 }
 
 void Link::PrintGlobalTransformationMatrix() {
-    char tmp[8];
-    sprintf(tmp, "T(%i)=", m_Id);
-    m_T.print(tmp);
+    cout << "T" << m_Id <<" =\n";
+    m_T.print();
 }
 
 void Link::SetGlobalTransformation(mat &T) {
@@ -66,18 +66,37 @@ double Link::GetTheta() {
 }
 
 void Link::GetRotation(mat &R) {
-    R.set_size(4, 4);
+    R.set_size(3, 3);
     R << m_T.at(0, 0) << m_T.at(0, 1) << m_T.at(0, 2) << endr
         << m_T.at(1, 0) << m_T.at(1, 1) << m_T.at(1, 2) << endr
         << m_T.at(2, 0) << m_T.at(2, 1) << m_T.at(2, 2) << endr;
 }
 
+void Link::GetRotation(double R[3][3])
+{
+    mat r;
+    GetRotation(r);
+    
+    for (size_t i = 0; i < 3; i++)
+        for (size_t j = 0; j < 3; j++) 
+            R[i][j] = r.at(i, j);
+}
+
 void Link::GetPosition(mat &T) {
     //m_A.print("A=");
-    T.set_size(4, 1);
+    T.set_size(3, 1);
     T << m_T.at(0, 3) << endr
         << m_T.at(1, 3) << endr
         << m_T.at(2, 3) << endr;
+}
+
+void Link::GetPosition(double p[3]) {
+    mat pos;
+    GetPosition(pos);
+
+    for (size_t i = 0; i < 3; i++) 
+        p[i] = pos.at(i, 0);
+        
 }
 
 void Link::GetTransformation(mat &A) {

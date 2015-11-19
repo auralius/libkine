@@ -16,21 +16,25 @@
 #include <pthread.h>
 #endif
 
+#include <iomanip>
 #include <vector>
 #include "Link.h"
 
 class Robot {
 public:
+    // Constructor
     Robot();
 
+    // Destructor
     ~Robot();
 
     // Add a new link, given the DH parameter of the link
-    void AddLink(double a, double alpha, double d, double theta, Link::joint_t type, char * stl_fn = NULL);
+    void AddLink(double a, double alpha, double d, double theta, 
+                 Link::joint_t type, char * stl_fn = NULL);
 
-    // After the joint angle (theta) or translation (d) is updated, call this function to recalculate
-    // the transformation matrix of all links
-    void Update();
+    // After the joint angle (theta) or translation (d) is updated, call this 
+    // function to recalculate the transformation matrix of all links
+    void Update(int verbose = 0);
 
     // Set the joint position
     void SetTheta(int n_link, double theta);
@@ -41,8 +45,14 @@ public:
     // Set an STL file to render for the current link
     void SetBaseSTLFileName(const char *fn);
 
+    // Set logging file name
+    void SetLogFileName(const char *fn);
+
     // Get the vector that hold all links together
     vector<Link *> GetLinks();
+
+    // Set the simulation sampling rate
+    void SetSimulationRate(double rate);
 
     // Given a link, find its tip position
     void GetTipPosition(int n_link, mat &p);
@@ -56,18 +66,29 @@ public:
     // Given a link, get its joint position, measured from global frame
     void GetJointPosition(int n_link, double p[3]);
 
-    // Given a link, get its homogeneous transformation matrix at the tip, measured from global frame
+    // Given a link, get its homogeneous transformation matrix at the tip, 
+    // measured from global frame
     void GetTipTransformation(int n_link, mat &A);
 
-    // Given a link, get its homogeneous transformation matrix at the joint, measured from global frame
+    // Given a link, get its homogeneous transformation matrix at the joint, 
+    // measured from global frame
     void GetJointTransformation(int n_link, mat &A);
 
     // Get the STL file name, return NULL if it not defined
     const char *GetBaseSTLFileName();
 
+    // Get the end effector position;
+    void GetEndEffectorPosition(double p[3]);
+
+    // Get the rotation matrix of the end effector;
+    void GetEndEffectorRotation(double R[3][3]);
+
 private:
     // Calculate the link transformation matrix, as soon as it is added 
     void CalcTransformationMatrix(Link &l, mat &A);
+
+    // Print out interesting data
+    void DoVerbosity();
 
     // Vector to hold the links
     vector<Link *> m_Links;
@@ -77,6 +98,19 @@ private:
 
     // File name for STL file of the robot's base
     string m_BaseSTLFileName;
+
+    // Simulation time
+    double m_SimulationTime;
+
+    // Sampling rate for the simulation
+    double m_SimulationRate;
+
+    // Stream for data logging
+    ofstream m_LoggingStream;
+
+    // Falg for logging
+    int m_DoLogging;
+
 };
 
 
