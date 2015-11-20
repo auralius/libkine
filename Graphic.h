@@ -100,6 +100,8 @@ private:
     // Another STL file can be provided for the base of the robot
     void RenderBase();
 
+    double *Rgb(char c);
+
     // Pointer to the robot
     Robot *m_Robot;
 

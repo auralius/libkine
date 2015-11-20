@@ -35,12 +35,14 @@ int main(int, char **argv) {
     puma.SetBaseSTLFileName("E:\\GIT\\libkine\\model\\puma\\base.STL");
     puma.SetBasePosition(-0.10, 0, 0);
 
+    double c[3] = { 1, 1, 0 };
+
     //      a, alpha, d, theta, type
-    puma.AddLink(0, 0, 0, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link1.STL");
-    puma.AddLink(0, -M_PI_2, d2, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link2.STL");
-    puma.AddLink(a2, 0, d3, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link3.STL");
-    puma.AddLink(a3, M_PI_2, d4, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link4.STL");
-    puma.AddLink(0, -M_PI_2, 0, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link5.STL");
+    puma.AddLink(0, 0, 0, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link1.STL", 'r');
+    puma.AddLink(0, -M_PI_2, d2, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link2.STL", 'g');
+    puma.AddLink(a2, 0, d3, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link3.STL", 'b');
+    puma.AddLink(a3, M_PI_2, d4, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link4.STL", 'w');
+    puma.AddLink(0, -M_PI_2, 0, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link5.STL", 'k');
     puma.AddLink(0, M_PI_2, d6, 0, Link::REVOLUTE);
 
     puma.SetLogFileName("puma.log");
@@ -50,7 +52,7 @@ int main(int, char **argv) {
 
     Graphic G(&puma, "Puma");
     G.SetGraphicScaling(0.15);
-    G.SetOpacity(0.7);
+    G.SetOpacity(1);
     G.Run();  // Blocks here until VTK GUI is closed
 
     running = 0;

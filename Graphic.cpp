@@ -23,7 +23,6 @@ void vtkTimerCallback::Execute(vtkObject *caller, unsigned long eventId,
 
     double p0[3] = { 0, 0, 0 };
     double p1[3] = { 0, 0, 0 };
-    int stl_indexer = 0;
 
     for (size_t i = 0; i < links.size(); i++) {
 
@@ -58,8 +57,12 @@ void vtkTimerCallback::Execute(vtkObject *caller, unsigned long eventId,
             transform_joint->PostMultiply();
             transform_joint->SetMatrix(vtk_A_tip);
 
-            m_STLActors->at(stl_indexer)->SetUserTransform(transform_joint);
-            stl_indexer = stl_indexer + 1;
+            // Index zero is for the base, so we use i+1
+            m_STLActors->at(i+1)->SetUserTransform(transform_joint);
+
+            // Move the robot base to the desired base position
+            if (i == 0) 
+                m_STLActors->at(i)->SetPosition(p0);
         }
     }
 
@@ -232,10 +235,15 @@ void Graphic::CreateSTLs() {
             actor->SetVisibility(m_STLVisibility);
             actor->GetProperty()->SetOpacity(m_Opacity);
 
+            char c = l->GetColor();
+            actor->GetProperty()->SetColor(Rgb(c));
+
             m_Ren->AddActor(actor);
 
             m_STLActors.push_back(actor);
         }
+        else
+            m_STLActors.push_back(NULL);
     }
 }
 
@@ -262,7 +270,65 @@ void Graphic::RenderBase()
         double p[3];
         m_Robot->GetBasePosition(p);
         actor->SetPosition(p);
+        actor->GetProperty()->SetColor(Rgb('w')); // White color for the base
 
         m_Ren->AddActor(actor);
+
+        m_STLActors.push_back(actor);
     }
+    else
+        m_STLActors.push_back(NULL);
+}
+
+double * Graphic::Rgb(char c)
+{
+    double color[3];
+    if (c == 'r') {
+        color[0] = 1;
+        color[1] = 0;
+        color[2] = 0;
+    }
+    else if (c == 'g') {
+        color[0] = 0;
+        color[1] = 1;
+        color[2] = 0;
+    }
+    else if (c == 'b') {
+        color[0] = 0;
+        color[1] = 0;
+        color[2] = 1;
+    }
+    else if (c == 'y') {
+        color[0] = 1;
+        color[1] = 1;
+        color[2] = 0;
+    }
+    else if (c == 'k') {
+        color[0] = 0;
+        color[1] = 0;
+        color[2] = 0;
+    }
+    else if (c == 'c') {
+        color[0] = 0;
+        color[1] = 1;
+        color[2] = 1;
+    }
+    else if (c == 'm') {
+        color[0] = 1;
+        color[1] = 0;
+        color[2] = 1;
+    }
+    else if (c == 'w') {
+        color[0] = 1;
+        color[1] = 1;
+        color[2] = 1;
+    }
+    else {
+        color[0] = 1;
+        color[1] = 1;
+        color[2] = 1;
+    }
+
+    return color;
+
 }

@@ -30,7 +30,7 @@ public:
 
     // Add a new link, given the DH parameter of the link
     void AddLink(double a, double alpha, double d, double theta, 
-                 Link::joint_t type, char * stl_fn = NULL);
+        Link::joint_t type, char * stl_fn = NULL, char c = 'e');
 
     // After the joint angle (theta) or translation (d) is updated, call this 
     // function to recalculate the transformation matrix of all links

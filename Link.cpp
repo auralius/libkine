@@ -11,6 +11,8 @@ Link::Link(double a, double alpha, double d, double theta, Link::joint_t type)
     m_D = d;
     m_Theta = theta;
     m_Type = type;
+
+    m_Color = 'e';
 }
 
 Link::~Link() {
@@ -43,6 +45,10 @@ void Link::SetD(double d) {
 
 void Link::SetSTLFileName(const char *fn) {
     m_STLFileName = fn;
+}
+
+void Link::SetColor(char c) {
+     m_Color = c;
 }
 
 int Link::GetJointId() {
@@ -117,4 +123,8 @@ const char *Link::GetSTLFileName() {
         return NULL;
 
     return m_STLFileName.c_str();
+}
+
+char Link::GetColor() {
+    return m_Color;
 }

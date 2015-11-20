@@ -26,7 +26,7 @@ Robot::~Robot() {
 }
 
 void Robot::AddLink(double a, double alpha, double d, double theta, 
-    Link::joint_t type, char * stl_fn) {
+    Link::joint_t type, char * stl_fn, char c) {
     Link *l = new Link(a, alpha, d, theta, type);
     m_Links.push_back(l);
 
@@ -46,6 +46,8 @@ void Robot::AddLink(double a, double alpha, double d, double theta,
     }
 
     l->SetGlobalTransformation(A);
+
+    l->SetColor(c);
 }
 
 void Robot::Update(int verbose) {
@@ -156,7 +158,7 @@ void Robot::GetJointPosition(int n_link, mat &p) {
     if (n_link > 0)
         m_Links.at(n_link - 1)->GetPosition(p);
     else
-        p << 0 << endr << 0 << endr << 0 << endr;
+        p = m_BasePos;
 }
 
 void Robot::GetTipTransformation(int n_link, mat &A) {

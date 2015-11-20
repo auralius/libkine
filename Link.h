@@ -42,6 +42,9 @@ public:
     // Provide an STL file
     void SetSTLFileName(const char *fn);
 
+    // Set the STL color
+    void SetColor(char c);
+
     // Return the joint id
     int GetJointId();
 
@@ -81,6 +84,10 @@ public:
     // Get the file name of the STL file
     const char *GetSTLFileName();
 
+    // Get the defined color for the STL model
+    char GetColor();
+
+
 private:
 
     // Joint id
@@ -110,6 +117,8 @@ private:
     // 3D model of the link
     string m_STLFileName;
 
+    // Link color as rgb
+    char m_Color;
 
 };
 
