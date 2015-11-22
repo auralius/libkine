@@ -82,7 +82,7 @@ void vtkTimerCallback::ArmaMatToVTKMat(vtkSmartPointer<vtkMatrix4x4> &to,
 /*---------------------------------------------------------------------------*/
 
 Graphic::Graphic(Robot *robot, const char *window_title) {
-
+    m_CamDist = 3;
     m_K = 0.05;
     m_Robot = robot;
     m_STLVisibility = 1;
@@ -148,7 +148,7 @@ void Graphic::Run() {
 
     // Camera
     vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
-    camera->SetPosition(0, -2, 0);
+    camera->SetPosition(0, -m_CamDist, 0);
     camera->SetFocalPoint(0, 0, 0);
     camera->SetViewUp(0, 0, 1);
     m_Ren->SetActiveCamera(camera);
@@ -170,6 +170,10 @@ void Graphic::SetOpacity(double opacity) {
 }
 
 
+
+void Graphic::SetCameraDistance(double dist) {
+    m_CamDist = dist;
+}
 
 void Graphic::CreateAxes() {
     ostringstream o;

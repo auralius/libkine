@@ -84,6 +84,9 @@ public:
     // Set transparency of the STL models
     void SetOpacity(double opacity);
 
+    // Set camera distance
+    void SetCameraDistance(double dist);
+
     // Run the graphic
     void Run();
 
@@ -116,6 +119,9 @@ private:
 
     // the window title
     string m_WindowTitle;
+
+    // How far in the intial position of the camera
+    double m_CamDist;
 
     //
     // All variables need to render a vtk windows
