@@ -90,18 +90,31 @@ Graphic::Graphic(Robot *robot, const char *window_title) {
     m_WindowTitle = window_title;
 
     m_Ren = vtkRenderer::New();
+    m_RenSTL = vtkRenderer::New();
+
     m_RenWin = vtkRenderWindow::New();
+    m_RenWin->SetNumberOfLayers(2);
+    m_RenWin->AddRenderer(m_RenSTL);
     m_RenWin->AddRenderer(m_Ren);
+    
+    m_RenSTL->SetLayer(0);
+    m_Ren->SetLayer(1);
+
+
     m_Iren = vtkRenderWindowInteractor::New();
     m_Iren->SetRenderWindow(m_RenWin);
 
     m_Ren->SetBackground(.3, .6, .3);
+    m_RenSTL->SetBackground(.3, .6, .3);
+
     m_RenWin->SetSize(600, 600);
     m_RenWin->SetWindowName(m_WindowTitle.c_str());
 }
 
 Graphic::~Graphic() {
     m_Ren->Delete();
+    m_RenSTL->Delete();
+
     m_RenWin->Delete();
     m_Iren->Delete();
 }
@@ -139,6 +152,7 @@ void Graphic::Run() {
     camera->SetFocalPoint(0, 0, 0);
     camera->SetViewUp(0, 0, 1);
     m_Ren->SetActiveCamera(camera);
+    m_RenSTL->SetActiveCamera(camera);
 
     m_Iren->Start();
 }
@@ -238,7 +252,7 @@ void Graphic::CreateSTLs() {
             char c = l->GetColor();
             actor->GetProperty()->SetColor(Rgb(c));
 
-            m_Ren->AddActor(actor);
+            m_RenSTL->AddActor(actor);
 
             m_STLActors.push_back(actor);
         }
@@ -272,7 +286,7 @@ void Graphic::RenderBase()
         actor->SetPosition(p);
         actor->GetProperty()->SetColor(Rgb('w')); // White color for the base
 
-        m_Ren->AddActor(actor);
+        m_RenSTL->AddActor(actor);
 
         m_STLActors.push_back(actor);
     }

@@ -11,7 +11,7 @@ Feature:
 
  * [ ] Rigid body velocity / Jacobian
 
- * [ ] 3D Visualization with using STL file
+ * [x] 3D Visualization with using STL file
 
 Dependencies:
 

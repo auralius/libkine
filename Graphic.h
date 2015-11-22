@@ -121,6 +121,7 @@ private:
     // All variables need to render a vtk windows
     //
     vtkRenderer *m_Ren;
+    vtkRenderer *m_RenSTL;
     vtkRenderWindow *m_RenWin;
     vtkRenderWindowInteractor *m_Iren;
 
