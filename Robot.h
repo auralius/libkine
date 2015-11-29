@@ -23,14 +23,15 @@
 class Robot {
 public:
     // Constructor
+    Robot(const char *fn);
     Robot();
-
+    
     // Destructor
     ~Robot();
 
     // Add a new link, given the DH parameter of the link
     void AddLink(double a, double alpha, double d, double theta, 
-        Link::joint_t type, char * stl_fn = NULL, char c = 'e');
+        const char *stl_fn = NULL, char c = 'e');
 
     // After the joint angle (theta) or translation (d) is updated, call this 
     // function to recalculate the transformation matrix of all links
@@ -89,6 +90,9 @@ public:
     void GetBasePosition(double p[3]);
 
 private:
+    // Iinitialize variables
+    void InitVariables();
+
     // Calculate the link transformation matrix, as soon as it is added 
     void CalcTransformationMatrix(Link &l, mat &A);
 

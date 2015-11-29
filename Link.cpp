@@ -4,13 +4,12 @@
 
 #include "Link.h"
 
-Link::Link(double a, double alpha, double d, double theta, Link::joint_t type) 
+Link::Link(double a, double alpha, double d, double theta) 
 {
     m_A = a;
     m_Alpha = alpha;
     m_D = d;
     m_Theta = theta;
-    m_Type = type;
 
     m_Color = 'e';
 }

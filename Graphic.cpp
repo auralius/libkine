@@ -61,7 +61,7 @@ void vtkTimerCallback::Execute(vtkObject *caller, unsigned long eventId,
             m_STLActors->at(i+1)->SetUserTransform(transform_joint);
 
             // Move the robot base to the desired base position
-            if (i == 0) 
+            if (i == 0 && m_STLActors->at(i))
                 m_STLActors->at(i)->SetPosition(p0);
         }
     }

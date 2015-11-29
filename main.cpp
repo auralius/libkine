@@ -23,7 +23,7 @@ void *simulation(void *ptr) {
     return NULL;
 }
 
-int main(int, char **argv) {
+int main(int argc, char **argv) {
     double d2 = 218.44 / 1000.0;
     double d3 = -88.9 / 1000.0;
     double a2 = 332.74 / 1000.0;
@@ -31,19 +31,21 @@ int main(int, char **argv) {
     double d4 = 432.09 / 1000.0;
     double d6 = 53.34 / 1000.0;
 
-    Robot puma;
-    puma.SetBaseSTLFileName("E:\\GIT\\libkine\\model\\puma\\base.STL");
-    puma.SetBasePosition(-0.10, 0, 0);
+
+    //Robot puma;
+    Robot puma(argv[1]);
+    //puma.SetBaseSTLFileName("E:\\GIT\\libkine\\model\\puma\\base.STL");
+    //puma.SetBasePosition(-0.10, 0, 0);
 
     double c[3] = { 1, 1, 0 };
 
     //      a, alpha, d, theta, type
-    puma.AddLink(0, 0, 0, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link1.STL", 'r');
+    /*puma.AddLink(0, 0, 0, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link1.STL", 'r');
     puma.AddLink(0, -M_PI_2, d2, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link2.STL", 'g');
     puma.AddLink(a2, 0, d3, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link3.STL", 'b');
     puma.AddLink(a3, M_PI_2, d4, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link4.STL", 'y');
     puma.AddLink(0, -M_PI_2, 0, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link5.STL", 'm');
-    puma.AddLink(0, M_PI_2, d6, 0, Link::REVOLUTE);
+    puma.AddLink(0, M_PI_2, d6, 0, Link::REVOLUTE);*/
 
     puma.SetLogFileName("puma.log");
 

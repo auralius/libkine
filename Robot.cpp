@@ -5,6 +5,102 @@
 #include "Robot.h"
 
 Robot::Robot() {
+    InitVariables();
+}
+
+Robot::Robot(const char *fn) {
+    InitVariables();
+    
+    ifstream file(fn);
+    if (!file.is_open())
+        throw std::invalid_argument("File not found!");
+
+    string line;
+    int line_num = 0;
+    
+    while (!file.eof()) {
+        cout << file.eof();
+        while (1) {
+            getline(file, line);
+            
+            if (file.eof())
+                break;
+
+            // Ignore all spaces
+            remove_if(line.begin(), line.end(), isspace);
+            
+            // Ignore empty and commented lines
+            if (!line.empty())
+                if (line.at(0) != '#')
+                    break;
+        }
+        
+        istringstream ss(line);
+
+        double base_p[3] = { 0, 0, 0 };
+        double a = 0;
+        double alpha = 0;
+        double d = 0;
+        double theta = 0;
+        char color = 'w';
+        char stl_fn[255];
+        stl_fn[0] = '\0';
+
+        string token;
+        size_t index = 0;
+
+        line_num = line_num + 1;
+
+        // Load the base coordinate and its STL file
+        if (line_num == 1) {
+            while (getline(ss, token, ',')) {
+                if (index == 0)
+                    base_p[0] = stod(token);
+                else if (index == 1)
+                    base_p[1] = stod(token);
+                else if (index == 2)
+                    base_p[2] = stod(token);
+                else if (index == 3)
+                    memcpy(stl_fn, token.c_str(), token.length() + 1);
+
+                index = index + 1;
+            }
+
+            if (strlen(stl_fn) > 1)
+                SetBaseSTLFileName(stl_fn);
+
+            SetBasePosition(base_p[0], base_p[1], base_p[2]);
+        }
+
+        // Load the DH Parameters and their STL files
+        else if (line_num > 1) {
+            while (getline(ss, token, ',')) {
+                if (index == 0)
+                    a = stod(token);
+                else if (index == 1)
+                    alpha = stod(token);
+                else if (index == 2)
+                    d = stod(token);
+                else if (index == 3)
+                    theta = stod(token);
+                else if (index == 4)
+                    memcpy(stl_fn, token.c_str(), token.length() + 1);
+                else if (index == 5)
+                    color = *token.c_str();
+
+                index = index + 1;
+            }
+
+            if (strlen(stl_fn) > 1)
+                AddLink(a, alpha / 180 * M_PI, d, theta, stl_fn, color);
+            else
+                AddLink(a, alpha / 180 * M_PI, d, theta);
+        }
+    }
+    file.close();
+}
+
+void Robot::InitVariables() {  
     m_DoLogging = 0;
     m_SimulationTime = 0;
     m_SimulationRate = 0.001; // 1khz initial sampling rate
@@ -12,6 +108,7 @@ Robot::Robot() {
 
     m_LoggingStream << fixed;
     m_LoggingStream << setprecision(5);
+    
 }
 
 Robot::~Robot() {
@@ -26,8 +123,8 @@ Robot::~Robot() {
 }
 
 void Robot::AddLink(double a, double alpha, double d, double theta, 
-    Link::joint_t type, char * stl_fn, char c) {
-    Link *l = new Link(a, alpha, d, theta, type);
+    const char * stl_fn, char c) {
+    Link *l = new Link(a, alpha, d, theta);
     m_Links.push_back(l);
 
     l->SetId(m_Links.size()-1);
@@ -112,7 +209,6 @@ void Robot::SetLogFileName(const char *fn) {
 
 void Robot::SetBasePosition(double x, double y, double z)
 {
-    m_BasePos.set_size(3, 1);
     m_BasePos << x << endr << y << endr << z << endr;
 }
 

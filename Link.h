@@ -17,7 +17,7 @@ public:
     };
 
     // Define the DH-parameters
-    Link(double a, double alpha, double d, double theta, joint_t type);
+    Link(double a, double alpha, double d, double theta);
 
     ~Link();
 
@@ -104,9 +104,6 @@ private:
 
     // Joint angle
     double m_Theta;
-
-    // Joint type
-    joint_t m_Type;
 
     // Global homogeneous transformation matrix, in global coordinate frame.
     mat m_T;
