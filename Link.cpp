@@ -4,13 +4,13 @@
 
 #include "Link.h"
 
-Link::Link(double a, double alpha, double d, double theta) 
+Link::Link(double a, double alpha, double d, double theta, joint_t type) 
 {
     m_A = a;
     m_Alpha = alpha;
     m_D = d;
     m_Theta = theta;
-
+    m_Type = type;
     m_Color = 'e';
 }
 
@@ -20,6 +20,13 @@ Link::~Link() {
 void Link::PrintGlobalTransformationMatrix() {
     cout << "T" << m_Id <<" =\n";
     m_T.print();
+}
+
+void Link::ActuateJoint(double v) {
+    if (m_Type == REVOLUTE)
+        SetTheta(v);
+    else if (m_Type == PRISMATIC)
+        SetD(v);
 }
 
 void Link::SetGlobalTransformation(mat &T) {
@@ -100,8 +107,7 @@ void Link::GetPosition(double p[3]) {
     GetPosition(pos);
 
     for (size_t i = 0; i < 3; i++) 
-        p[i] = pos.at(i, 0);
-        
+        p[i] = pos.at(i, 0);       
 }
 
 void Link::GetTransformation(mat &A) {
@@ -126,4 +132,8 @@ const char *Link::GetSTLFileName() {
 
 char Link::GetColor() {
     return m_Color;
+}
+
+Link::joint_t Link::GetJointType() {
+	return m_Type;
 }

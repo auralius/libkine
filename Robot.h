@@ -31,17 +31,15 @@ public:
 
     // Add a new link, given the DH parameter of the link
     void AddLink(double a, double alpha, double d, double theta, 
-        const char *stl_fn = NULL, char c = 'e');
+		Link::joint_t type = Link::REVOLUTE, const char *stl_fn = NULL, 
+		char c = 'e');
 
-    // After the joint angle (theta) or translation (d) is updated, call this 
+    // After the joint angle (theta) or translation (d) is updated, call this  
     // function to recalculate the transformation matrix of all links
     void Update(int verbose = 0);
 
-    // Set the joint position
-    void SetTheta(int n_link, double theta);
-
-    // Set the joint translation
-    void SetD(int n_link, double d);
+    // Actuate the joint, depending on the joint type: REVOLUTE of PRISMATIC
+    void ActuateJoint(int n_link, double v);
 
     // Set an STL file to render for the current link
     void SetBaseSTLFileName(const char *fn);
@@ -98,6 +96,12 @@ private:
 
     // Print out interesting data
     void DoVerbosity();
+
+	// Set the joint position
+	void SetTheta(int n_link, double theta);
+
+	// Set the joint translation
+	void SetD(int n_link, double d);
 
     // Vector to hold the links
     vector<Link *> m_Links;

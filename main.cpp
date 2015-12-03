@@ -6,11 +6,13 @@ int running = 1;
 void *simulation(void *ptr) {
     Robot *puma = (Robot *)ptr;
 
-    double x = 0;
+    double t = 0;
+    double y = 0;
     while (running) {
-        puma->SetTheta(1, x);
+        puma->ActuateJoint(2, y);
         puma->Update(1);
-        x = x + .01;
+        y = 0.2*sin(t);
+        t = t + 0.01;
 #ifdef WIN32
         Sleep(1);
 #else

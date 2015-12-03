@@ -27,7 +27,9 @@ Robot::Robot(const char *fn) {
                 break;
 
             // Ignore all spaces
-            remove_if(line.begin(), line.end(), isspace);
+			line.erase(
+				remove_if(line.begin(), line.end(), static_cast<int(*)(int)>(isspace)),
+				line.end());
             
             // Ignore empty and commented lines
             if (!line.empty())
@@ -42,12 +44,14 @@ Robot::Robot(const char *fn) {
         double alpha = 0;
         double d = 0;
         double theta = 0;
+		Link::joint_t type = Link::REVOLUTE; 
         char color = 'w';
-        char stl_fn[255];
-        stl_fn[0] = '\0';
+        string stl_fn;
+
 
         string token;
         size_t index = 0;
+		token = "";
 
         line_num = line_num + 1;
 
@@ -58,16 +62,18 @@ Robot::Robot(const char *fn) {
                     base_p[0] = stod(token);
                 else if (index == 1)
                     base_p[1] = stod(token);
-                else if (index == 2)
-                    base_p[2] = stod(token);
-                else if (index == 3)
-                    memcpy(stl_fn, token.c_str(), token.length() + 1);
+				else if (index == 2)
+					base_p[2] = stod(token);
+				else if (index == 3) {
+					token.append(" ");
+					stl_fn = token;
+				}
 
                 index = index + 1;
             }
 
-            if (strlen(stl_fn) > 1)
-                SetBaseSTLFileName(stl_fn);
+            if (strlen(stl_fn.c_str()) > 1)
+				SetBaseSTLFileName(stl_fn.c_str());
 
             SetBasePosition(base_p[0], base_p[1], base_p[2]);
         }
@@ -83,18 +89,20 @@ Robot::Robot(const char *fn) {
                     d = stod(token);
                 else if (index == 3)
                     theta = stod(token);
-                else if (index == 4)
-                    memcpy(stl_fn, token.c_str(), token.length() + 1);
-                else if (index == 5)
+				else if (index == 4)
+					type = (Link::joint_t) stoi(token);
+				else if (index == 5)
+					stl_fn = token;
+                else if (index == 6)
                     color = *token.c_str();
 
                 index = index + 1;
             }
 
-            if (strlen(stl_fn) > 1)
-                AddLink(a, alpha / 180 * M_PI, d, theta, stl_fn, color);
+            if (stl_fn.length() > 1)
+                AddLink(a, alpha / 180 * M_PI, d, theta, type, stl_fn.c_str(), color);
             else
-                AddLink(a, alpha / 180 * M_PI, d, theta);
+                AddLink(a, alpha / 180 * M_PI, d, theta, type);
         }
     }
     file.close();
@@ -123,8 +131,8 @@ Robot::~Robot() {
 }
 
 void Robot::AddLink(double a, double alpha, double d, double theta, 
-    const char * stl_fn, char c) {
-    Link *l = new Link(a, alpha, d, theta);
+	Link::joint_t type, const char * stl_fn, char c) {
+    Link *l = new Link(a, alpha, d, theta, type);
     m_Links.push_back(l);
 
     l->SetId(m_Links.size()-1);
@@ -169,6 +177,13 @@ void Robot::Update(int verbose) {
         DoVerbosity();
 
     m_SimulationTime = m_SimulationTime + m_SimulationRate;
+}
+
+void Robot::ActuateJoint(int n_link, double v) {
+	if (m_Links.at(n_link)->GetJointType() == Link::REVOLUTE)
+		SetTheta(n_link, v);
+	else if (m_Links.at(n_link)->GetJointType() == Link::PRISMATIC)
+		SetD(n_link, v);
 }
 
 void Robot::DoVerbosity()

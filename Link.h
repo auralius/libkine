@@ -13,16 +13,20 @@ using namespace arma;
 class Link {
 public:
     enum joint_t {
-        REVOLUTE, PRISMATIC, WELD
+        REVOLUTE = 0, 
+        PRISMATIC = 1
     };
 
     // Define the DH-parameters
-    Link(double a, double alpha, double d, double theta);
+    Link(double a, double alpha, double d, double theta, joint_t type = REVOLUTE);
 
     ~Link();
 
     // Print out the transformation matrix in global coordinate frame
     void PrintGlobalTransformationMatrix();
+
+    // Perform actuation, either rotational or prismatic
+    void ActuateJoint(double v);
 
     // Apply the homogeneous transformation matrix in global coordinate frame 
     void SetGlobalTransformation(mat &T);
@@ -87,6 +91,10 @@ public:
     // Get the defined color for the STL model
     char GetColor();
 
+	// Get joint type
+	joint_t GetJointType();
+
+
 
 private:
 
@@ -117,6 +125,7 @@ private:
     // Link color as rgb
     char m_Color;
 
+    joint_t m_Type;
 };
 
 
