@@ -8,8 +8,9 @@ void *simulation(void *ptr) {
 
     double t = 0;
     double y = 0;
-    while (running) {
-        puma->ActuateJoint(2, y);
+	while (running) {
+		puma->ActuateJoint(2, -0.2);
+        puma->ActuateJoint(3, y);
         puma->Update(1);
         y = 0.2*sin(t);
         t = t + 0.01;
