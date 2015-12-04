@@ -22,12 +22,14 @@
 
 class Robot {
 public:
-    // Constructor
+    // Constructor to load the DH parameters from an external file
     Robot(const char *fn);
+
+	// Constructor create the robot programatically
     Robot();
     
     // Destructor
-    ~Robot();
+	~Robot();
 
     // Add a new link, given the DH parameter of the link
     void AddLink(double a, double alpha, double d, double theta, 
