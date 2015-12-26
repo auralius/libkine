@@ -3,14 +3,15 @@
 
 # Location of the base
 # x, y, z, stl_file
-  0, 0, 0,..\model\scara\base.STL
+  0, 0, 0, ../model/scara/base.STL
 
 # DH Parameters
 # Joint type : 0 for revolute joint and 1 for prismatic joint
 # a,     alpha, d,     theta, joint type, stl_file,                 color
-  0,     0,     0,     0,     0,          ..\model\scara\link1.STL, r
-  0.45,  0,     0.21,  0,     0,          ..\model\scara\link2.STL, g
-  0.72,  0,     0,     0,     1,          ..\model\scara\link3.STL, b
-  0,     0,     0,     0,     0,          ..\model\scara\link4.STL, c
-  0,   -90,     0,     0,     0,          ..\model\scara\link5.STL, m
-  0,    90,     0,     0,     0,          ..\model\scara\link6.STL, r
+  0,     0,     0,     0,     0,          ../model/scara/link1.STL, r
+  0.45,  0,     0.21,  0,     0,          ../model/scara/link2.STL, g
+  0.72,  0,     0,     0,     1,          ../model/scara/link3.STL, b
+  0,     0,     0,     0,     0,          ../model/scara/link4.STL, c
+  0,   -90,     0,     0,     0,          ../model/scara/link5.STL, m
+  0,    90,     0,     0,     0,          ../model/scara/link6.STL, r
+

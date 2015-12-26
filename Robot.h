@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <vector>
 #include "Link.h"
+#include <string>
 
 class Robot {
 public:

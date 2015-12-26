@@ -44,14 +44,12 @@ Robot::Robot(const char *fn) {
         double alpha = 0;
         double d = 0;
         double theta = 0;
-		Link::joint_t type = Link::REVOLUTE; 
+        Link::joint_t type = Link::REVOLUTE; 
         char color = 'w';
         string stl_fn;
-
-
         string token;
         size_t index = 0;
-		token = "";
+        token = "";
 
         line_num = line_num + 1;
 
@@ -62,18 +60,17 @@ Robot::Robot(const char *fn) {
                     base_p[0] = stod(token);
                 else if (index == 1)
                     base_p[1] = stod(token);
-				else if (index == 2)
-					base_p[2] = stod(token);
-				else if (index == 3) {
-					token.append(" ");
-					stl_fn = token;
-				}
+                else if (index == 2)
+                    base_p[2] = stod(token);
+                else if (index == 3) {
+                    stl_fn = token;
+                }
 
                 index = index + 1;
             }
 
             if (strlen(stl_fn.c_str()) > 1)
-				SetBaseSTLFileName(stl_fn.c_str());
+                SetBaseSTLFileName(stl_fn.c_str());
 
             SetBasePosition(base_p[0], base_p[1], base_p[2]);
         }
@@ -89,10 +86,10 @@ Robot::Robot(const char *fn) {
                     d = stod(token);
                 else if (index == 3)
                     theta = stod(token);
-				else if (index == 4)
-					type = (Link::joint_t) stoi(token);
-				else if (index == 5)
-					stl_fn = token;
+                else if (index == 4)
+                    type = (Link::joint_t) stoi(token);
+                else if (index == 5)
+                    stl_fn = token;
                 else if (index == 6)
                     color = *token.c_str();
 
@@ -180,10 +177,10 @@ void Robot::Update(int verbose) {
 }
 
 void Robot::ActuateJoint(int n_link, double v) {
-	if (m_Links.at(n_link)->GetJointType() == Link::REVOLUTE)
-		SetTheta(n_link, v);
-	else if (m_Links.at(n_link)->GetJointType() == Link::PRISMATIC)
-		SetD(n_link, v);
+    if (m_Links.at(n_link)->GetJointType() == Link::REVOLUTE)
+        SetTheta(n_link, v);
+    else if (m_Links.at(n_link)->GetJointType() == Link::PRISMATIC)
+        SetD(n_link, v);
 }
 
 void Robot::DoVerbosity()

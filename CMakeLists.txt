@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(libkine)
 
+add_definitions(-std=c++11) 
+
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 

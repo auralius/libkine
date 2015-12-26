@@ -3,14 +3,14 @@
 
 # Location of the base
 # x, y, z, stl_file
-  0, 0, 0, ..\model\puma\base.STL
+  0, 0, 0, ../model/puma/base.STL
 
 # DH Parameters
 # Joint type : 0 for revolute joint and 1 for prismatic joint
 # a,       alpha, d,       theta, joint type, stl_file,color
-  0,       0,     0,       0,     0,          ..\model\puma\link1.STL,g
-  0,       -90,   0.21844, 0,     0,          ..\model\puma\link2.STL,b
-  0.33274, 0,     -0.0889, 0,     0,          ..\model\puma\link3.STL,c
-  0,       90,    0.43209, 0,     0,          ..\model\puma\link4.STL,m
-  0,       -90,   0,       0,     0,          ..\model\puma\link5.STL
+  0,       0,     0,       0,     0,          ../model/puma/link1.STL,g
+  0,       -90,   0.21844, 0,     0,          ../model/puma/link2.STL,b
+  0.33274, 0,     -0.0889, 0,     0,          ../model/puma/link3.STL,c
+  0,       90,    0.43209, 0,     0,          ../model/puma/link4.STL,m
+  0,       -90,   0,       0,     0,          ../model/puma/link5.STL
   0,       90,    0.05334, 0,     0
