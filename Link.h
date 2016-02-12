@@ -49,6 +49,9 @@ public:
     // Set the STL color
     void SetColor(char c);
 
+	// Set joint limits
+	void SetJointLimits(double min, double max);
+
     // Return the joint id
     int GetJointId();
 
@@ -94,6 +97,12 @@ public:
 	// Get joint type
 	joint_t GetJointType();
 
+	// Get joint minimum range
+	double GetMinJointLimit();
+
+	// Get joint maximum range
+	double GetMaxJointLimit();
+
 
 
 private:
@@ -126,6 +135,12 @@ private:
     char m_Color;
 
     joint_t m_Type;
+
+	// Maximum joint range
+	double m_JointMax;
+
+	// Minimum joint range
+	double m_JointMin;
 };
 
 

@@ -57,6 +57,13 @@ void Link::SetColor(char c) {
      m_Color = c;
 }
 
+void Link::SetJointLimits(double min, double max) {
+	if (min < max) {
+		m_JointMin = min;
+		m_JointMax = max;
+	}
+}
+
 int Link::GetJointId() {
     return m_Id;
 }
@@ -136,4 +143,12 @@ char Link::GetColor() {
 
 Link::joint_t Link::GetJointType() {
 	return m_Type;
+}
+
+double Link::GetMinJointLimit() {
+	return m_JointMin;
+}
+
+double Link::GetMaxJointLimit() {
+	return m_JointMax;
 }
