@@ -66,7 +66,6 @@ Robot::Robot(const char *fn) {
 				else if (index == 2)
 					base_p[2] = stod(token);
 				else if (index == 3) {
-					token.append(" ");
 					stl_fn = token;
 				}
 

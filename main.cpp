@@ -8,8 +8,8 @@ void *simulation(void *ptr) {
 
     double t = 0;
     double y = 0;
-	while (running) {
-		puma->ActuateJoint(2, -0.2);
+    while (running) {
+        puma->ActuateJoint(2, -0.2);
         puma->ActuateJoint(3, y);
         puma->Update(1);
         y = 0.2*sin(t);
@@ -17,7 +17,7 @@ void *simulation(void *ptr) {
 #ifdef WIN32
         Sleep(1);
 #else
-        usleep(1000)
+        usleep(1000);
 #endif
     }
 
@@ -37,17 +37,17 @@ int main(int argc, char **argv) {
 
     //Robot puma;
     Robot puma(argv[1]);
-    //puma.SetBaseSTLFileName("E:\\GIT\\libkine\\model\\puma\\base.STL");
+    //puma.SetBaseSTLFileName("../model/puma/base.STL");
     //puma.SetBasePosition(-0.10, 0, 0);
 
     double c[3] = { 1, 1, 0 };
 
     //      a, alpha, d, theta, type
-    /*puma.AddLink(0, 0, 0, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link1.STL", 'r');
-    puma.AddLink(0, -M_PI_2, d2, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link2.STL", 'g');
-    puma.AddLink(a2, 0, d3, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link3.STL", 'b');
-    puma.AddLink(a3, M_PI_2, d4, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link4.STL", 'y');
-    puma.AddLink(0, -M_PI_2, 0, 0, Link::REVOLUTE, "E:\\GIT\\libkine\\model\\puma\\link5.STL", 'm');
+    /*puma.AddLink(0, 0, 0, 0, Link::REVOLUTE, "../model/puma/link1.STL", 'r');
+    puma.AddLink(0, -M_PI_2, d2, 0, Link::REVOLUTE, "../model/puma/link2.STL", 'g');
+    puma.AddLink(a2, 0, d3, 0, Link::REVOLUTE, "../model/puma/link3.STL", 'b');
+    puma.AddLink(a3, M_PI_2, d4, 0, Link::REVOLUTE, "../model/puma/link4.STL", 'y');
+    puma.AddLink(0, -M_PI_2, 0, 0, Link::REVOLUTE, "../model/puma/link5.STL", 'm');
     puma.AddLink(0, M_PI_2, d6, 0, Link::REVOLUTE);*/
 
     puma.SetLogFileName("puma.log");

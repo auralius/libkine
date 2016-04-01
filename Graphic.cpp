@@ -254,7 +254,9 @@ void Graphic::CreateSTLs() {
             actor->GetProperty()->SetOpacity(m_Opacity);
 
             char c = l->GetColor();
-            actor->GetProperty()->SetColor(Rgb(c));
+            double color[3];
+            Rgb(c, color);
+            actor->GetProperty()->SetColor(color);
 
             m_RenSTL->AddActor(actor);
 
@@ -288,7 +290,10 @@ void Graphic::RenderBase()
         double p[3];
         m_Robot->GetBasePosition(p);
         actor->SetPosition(p);
-        actor->GetProperty()->SetColor(Rgb('w')); // White color for the base
+
+        double color[3];
+        Rgb('w', color);
+        actor->GetProperty()->SetColor(color); // White color for the base
 
         m_RenSTL->AddActor(actor);
 
@@ -298,9 +303,8 @@ void Graphic::RenderBase()
         m_STLActors.push_back(NULL);
 }
 
-double * Graphic::Rgb(char c)
+void Graphic::Rgb(char c, double color[3])
 {
-    double color[3];
     if (c == 'r') {
         color[0] = 1;
         color[1] = 0;
@@ -346,7 +350,4 @@ double * Graphic::Rgb(char c)
         color[1] = 1;
         color[2] = 1;
     }
-
-    return color;
-
 }
