@@ -270,7 +270,6 @@ void Robot::CalcTransformationMatrix(Link &l, mat &A) {
 
 void Robot::SetD(int n_link, double d) {
     m_Links.at(n_link)->SetD(d);
-    printf(".");
 }
 
 void Robot::GetTipPosition(int n_link, mat &p) {
