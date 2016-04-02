@@ -108,10 +108,10 @@ Robot::Robot(const char *fn) {
             else
                 AddLink(a, alpha / 180 * M_PI, d, theta, type);
 
-			if (type == Link::REVOLUTE) {
-				min_joint_limit = min_joint_limit / 180 * M_PI;
+/*			if (type == Link::REVOLUTE) {
+				min_joint_limit = min_joint_limit  * M_PI;
 				max_joint_limit = max_joint_limit / 180 * M_PI;
-			}
+			}*/
 
 			m_Links.at(m_Links.size() - 1)->SetJointLimits(min_joint_limit, max_joint_limit);
         }
@@ -119,7 +119,7 @@ Robot::Robot(const char *fn) {
     file.close();
 }
 
-void Robot::InitVariables() {  
+void Robot::InitVariables() {
     m_DoLogging = 0;
     m_SimulationTime = 0;
     m_SimulationRate = 0.001; // 1khz initial sampling rate
@@ -270,6 +270,7 @@ void Robot::CalcTransformationMatrix(Link &l, mat &A) {
 
 void Robot::SetD(int n_link, double d) {
     m_Links.at(n_link)->SetD(d);
+    printf(".");
 }
 
 void Robot::GetTipPosition(int n_link, mat &p) {

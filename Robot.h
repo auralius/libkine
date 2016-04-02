@@ -89,6 +89,10 @@ public:
     /// Get base position of the robot
     void GetBasePosition(double p[3]);
 
+    /// Stop
+    void Stop();
+
+
 private:
     // Iinitialize variables
     void InitVariables();
@@ -125,7 +129,6 @@ private:
 
     // Flag for logging
     int m_DoLogging;
-
 };
 
 

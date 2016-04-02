@@ -7,7 +7,10 @@ add_definitions(-std=c++11)
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 
-add_executable(libkine main.cpp Link.cpp Link.h Robot.cpp Robot.h Graphic.cpp Graphic.h)
+find_package(FLTK REQUIRED)
+find_package(OpenGL REQUIRED)
+
+add_executable(libkine main.cpp Link.cpp Link.h Robot.cpp Robot.h Graphic.cpp Graphic.h JointSliders.cpp JointSliders.h)
 
 if (VTK_LIBRARIES)
     target_link_libraries(libkine ${VTK_LIBRARIES})
@@ -17,4 +20,4 @@ endif ()
 
 install(TARGETS libkine RUNTIME DESTINATION bin)
 
-target_link_libraries(libkine pthread armadillo)
+target_link_libraries(libkine pthread armadillo ${FLTK_LIBRARIES} ${OPENGL_LIBRARIES})
