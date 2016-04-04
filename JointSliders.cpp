@@ -16,8 +16,8 @@ JointSliders::JointSliders(Robot *robot) {
 
     for (size_t i = 0; i < n; i++) {
 
-        char *c = new char(3);
-        sprintf(c, "%lu", i);
+        char *c = new char(10);
+        snprintf(c, 10, "Joint-%lu", i);
         Fl_Slider *slider;
         slider = new Fl_Slider(20, 25 + (40 * (int) i), 300, 20, c);
 
@@ -39,10 +39,6 @@ JointSliders::JointSliders(Robot *robot) {
 
 JointSliders::~JointSliders() {
     // Window has been closed, now clean up!
-    // TODO: The odes below cause exit 139
-//    for (size_t i = 0; i < m_Sliders.size(); i++) {
-//        delete [] m_Sliders.at(i);
-//    }
     delete m_Win;
 }
 
@@ -71,6 +67,11 @@ void *JointSliders::RunWorker() {
 }
 
 void JointSliders::End() {
+    for (int i = 0; i < m_Sliders.size(); i ++) {
+        Fl_Slider *slider = m_Sliders.at(i);
+        delete [] slider->label();
+    }
+
     m_Win->end();
 }
 
