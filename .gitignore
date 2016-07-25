@@ -39,3 +39,5 @@ Release/
 *.user
 *.opensdf
 
+*.log
+
