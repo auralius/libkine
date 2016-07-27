@@ -251,10 +251,6 @@ void Graphic::CreateSTLs() {
             vtkSmartPointer<vtkFeatureEdges> feature_edges =
                 vtkSmartPointer<vtkFeatureEdges>::New();
             feature_edges->SetInputConnection(reader->GetOutputPort());
-            feature_edges->BoundaryEdgesOff();
-            feature_edges->FeatureEdgesOn();
-            feature_edges->ManifoldEdgesOff();
-            feature_edges->NonManifoldEdgesOff();
             feature_edges->Update();
             
             // Visualize the edges
@@ -264,7 +260,7 @@ void Graphic::CreateSTLs() {
             vtkSmartPointer<vtkActor> edge_actor =
                 vtkSmartPointer<vtkActor>::New();
             edge_actor->SetMapper(edge_mapper);
-            edge_actor->GetProperty()->SetLineWidth(2);
+            edge_actor->GetProperty()->SetLineWidth(4);
             edge_actor->GetProperty()->SetEdgeColor(0,0,0);
             edge_actor->GetProperty()->EdgeVisibilityOn();
 
@@ -310,10 +306,6 @@ void Graphic::RenderBase()
         vtkSmartPointer<vtkFeatureEdges> feature_edges =
             vtkSmartPointer<vtkFeatureEdges>::New();
         feature_edges->SetInputConnection(reader->GetOutputPort());
-        feature_edges->BoundaryEdgesOff();
-        feature_edges->FeatureEdgesOn();
-        feature_edges->ManifoldEdgesOff();
-        feature_edges->NonManifoldEdgesOff();
         feature_edges->Update();
         
         // Visualize the edges
@@ -323,7 +315,7 @@ void Graphic::RenderBase()
         vtkSmartPointer<vtkActor> edge_actor =
             vtkSmartPointer<vtkActor>::New();
         edge_actor->SetMapper(edge_mapper);
-        edge_actor->GetProperty()->SetLineWidth(2);
+        edge_actor->GetProperty()->SetLineWidth(4);
         edge_actor->GetProperty()->SetEdgeColor(0,0,0);
         edge_actor->GetProperty()->EdgeVisibilityOn();
 
