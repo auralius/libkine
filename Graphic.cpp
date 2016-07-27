@@ -59,10 +59,13 @@ void vtkTimerCallback::Execute(vtkObject *caller, unsigned long eventId,
 
             // Index zero is for the base, so we use i+1
             m_STLActors->at(i+1)->SetUserTransform(transform_joint);
+            m_EdgeActors->at(i+1)->SetUserTransform(transform_joint);              
 
             // Move the robot base to the desired base position
-            if (i == 0 && m_STLActors->at(i))
+            if (i == 0 && m_STLActors->at(i)) {
                 m_STLActors->at(i)->SetPosition(p0);
+                m_EdgeActors->at(i)->SetPosition(p0);
+            }
         }
     }
 
@@ -133,6 +136,7 @@ void Graphic::Run() {
         vtkSmartPointer<vtkTimerCallback>::New();
 
     cb->m_AxesActors = &m_AxesActors;
+    cb->m_EdgeActors = &m_EdgeActors;
     cb->m_LineSources = &m_LineSources;
     cb->m_STLActors = &m_STLActors;
     cb->m_Robot = m_Robot;
@@ -242,28 +246,54 @@ void Graphic::CreateSTLs() {
                 vtkSmartPointer<vtkSTLReader>::New();
             reader->SetFileName(fn);
             reader->Update();
-
-            // Visualize
-            vtkSmartPointer<vtkPolyDataMapper> mapper = 
+            
+            // Edges
+            vtkSmartPointer<vtkFeatureEdges> feature_edges =
+                vtkSmartPointer<vtkFeatureEdges>::New();
+            feature_edges->SetInputConnection(reader->GetOutputPort());
+            feature_edges->BoundaryEdgesOff();
+            feature_edges->FeatureEdgesOn();
+            feature_edges->ManifoldEdgesOff();
+            feature_edges->NonManifoldEdgesOff();
+            feature_edges->Update();
+            
+            // Visualize the edges
+            vtkSmartPointer<vtkPolyDataMapper> edge_mapper = 
                 vtkSmartPointer<vtkPolyDataMapper>::New();
-            mapper->SetInputConnection(reader->GetOutputPort());
+            edge_mapper->SetInputConnection(feature_edges->GetOutputPort());
+            vtkSmartPointer<vtkActor> edge_actor =
+                vtkSmartPointer<vtkActor>::New();
+            edge_actor->SetMapper(edge_mapper);
+            edge_actor->GetProperty()->SetLineWidth(2);
+            edge_actor->GetProperty()->SetEdgeColor(0,0,0);
+            edge_actor->GetProperty()->EdgeVisibilityOn();
 
-            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-            actor->SetMapper(mapper);
-            actor->SetVisibility(m_STLVisibility);
-            actor->GetProperty()->SetOpacity(m_Opacity);
+            // Visualize the STLs
+            vtkSmartPointer<vtkPolyDataMapper> stl_mapper = 
+                vtkSmartPointer<vtkPolyDataMapper>::New();
+            stl_mapper->SetInputConnection(reader->GetOutputPort());
+
+            vtkSmartPointer<vtkActor> stl_actor = vtkSmartPointer<vtkActor>::New();
+            stl_actor->SetMapper(stl_mapper);
+            stl_actor->SetVisibility(m_STLVisibility);
+            stl_actor->GetProperty()->SetOpacity(m_Opacity);
 
             char c = l->GetColor();
             double color[3];
             Rgb(c, color);
-            actor->GetProperty()->SetColor(color);
+            stl_actor->GetProperty()->SetColor(color);
 
-            m_RenSTL->AddActor(actor);
+            //
+            m_RenSTL->AddActor(stl_actor);
+            m_RenSTL->AddActor(edge_actor);
 
-            m_STLActors.push_back(actor);
+            m_STLActors.push_back(stl_actor);
+            m_EdgeActors.push_back(edge_actor);
         }
-        else
+        else {
             m_STLActors.push_back(NULL);
+            m_EdgeActors.push_back(NULL);
+        }
     }
 }
 
@@ -275,32 +305,59 @@ void Graphic::RenderBase()
             vtkSmartPointer<vtkSTLReader>::New();
         reader->SetFileName(fn);
         reader->Update();
-
-        // Visualize
-        vtkSmartPointer<vtkPolyDataMapper> mapper = 
+        
+        // Edges
+        vtkSmartPointer<vtkFeatureEdges> feature_edges =
+            vtkSmartPointer<vtkFeatureEdges>::New();
+        feature_edges->SetInputConnection(reader->GetOutputPort());
+        feature_edges->BoundaryEdgesOff();
+        feature_edges->FeatureEdgesOn();
+        feature_edges->ManifoldEdgesOff();
+        feature_edges->NonManifoldEdgesOff();
+        feature_edges->Update();
+        
+        // Visualize the edges
+        vtkSmartPointer<vtkPolyDataMapper> edge_mapper = 
             vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(reader->GetOutputPort());
-
-        vtkSmartPointer<vtkActor> actor = 
+        edge_mapper->SetInputConnection(feature_edges->GetOutputPort());
+        vtkSmartPointer<vtkActor> edge_actor =
             vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-        actor->SetVisibility(m_STLVisibility);
-        actor->GetProperty()->SetOpacity(m_Opacity);
+        edge_actor->SetMapper(edge_mapper);
+        edge_actor->GetProperty()->SetLineWidth(2);
+        edge_actor->GetProperty()->SetEdgeColor(0,0,0);
+        edge_actor->GetProperty()->EdgeVisibilityOn();
+
+        // Visualize th STLs
+        vtkSmartPointer<vtkPolyDataMapper> stl_mapper = 
+            vtkSmartPointer<vtkPolyDataMapper>::New();
+        stl_mapper->SetInputConnection(reader->GetOutputPort());
+
+        vtkSmartPointer<vtkActor> stl_actor = 
+            vtkSmartPointer<vtkActor>::New();
+        stl_actor->SetMapper(stl_mapper);
+        stl_actor->SetVisibility(m_STLVisibility);
+        stl_actor->GetProperty()->SetOpacity(m_Opacity);
 
         double p[3];
         m_Robot->GetBasePosition(p);
-        actor->SetPosition(p);
-
+        stl_actor->SetPosition(p);
+        edge_actor->SetPosition(p);
+        
         double color[3];
         Rgb('w', color);
-        actor->GetProperty()->SetColor(color); // White color for the base
+        stl_actor->GetProperty()->SetColor(color); // White color for the base
 
-        m_RenSTL->AddActor(actor);
+        //
+        m_RenSTL->AddActor(stl_actor);
+        m_RenSTL->AddActor(edge_actor);
 
-        m_STLActors.push_back(actor);
+        m_STLActors.push_back(stl_actor);
+        m_EdgeActors.push_back(edge_actor);
     }
-    else
+    else {
         m_STLActors.push_back(NULL);
+        m_EdgeActors.push_back(NULL);
+    }
 }
 
 void Graphic::Rgb(char c, double color[3])

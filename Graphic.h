@@ -30,6 +30,7 @@ VTK_MODULE_INIT(vtkRenderingFreeType);
 #include <vtkTextProperty.h>
 #include <vtkCaptionActor2D.h>
 #include <vtkSTLReader.h>
+#include <vtkFeatureEdges.h>
 
 #include "Robot.h"
 
@@ -61,6 +62,9 @@ public:
 
     // Vector of pointers of the actors for the STL files
     vector<vtkSmartPointer<vtkActor> > *m_STLActors;
+    
+    // Vector of pointers of the actors for the boundary edges
+    vector<vtkSmartPointer<vtkActor> > *m_EdgeActors;
 
     // Pointer to the robot
     Robot *m_Robot;
@@ -139,6 +143,10 @@ private:
 
     // Vector to hold the created lines
     vector<vtkSmartPointer<vtkLineSource> > m_LineSources;
+    
+    // Vector to hold the boundary edges
+    vector<vtkSmartPointer<vtkActor> > m_EdgeActors;
+    
 };
 
 
