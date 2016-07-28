@@ -28,3 +28,5 @@ How to Install:
 5. Go inside build, type: cmake ..
 6. Type: make
 7. Run: ./libkine ../model/puma/puma.csv
+
+Bnaries and models are stored using git-lfs (https://git-lfs.github.com).
