@@ -5,8 +5,9 @@
 #include "JointSliders.h"
 
 
-JointSliders::JointSliders(Robot *robot) {
+JointSliders::JointSliders(Robot *robot, int verbose) {
     m_Robot = robot;
+    m_Verbose = verbose;
 
     // How many joints we have?
     size_t n = robot->GetLinks().size();
@@ -51,7 +52,7 @@ void JointSliders::SliderCBWorker() {
     for (size_t i = 0; i < n; i++) {
         m_Robot->ActuateJoint((int) i, m_Sliders.at(i)->value());
     }
-    m_Robot->Update();
+    m_Robot->Update(m_Verbose);
 }
 
 Fl_Window *JointSliders::GetWindow() {
