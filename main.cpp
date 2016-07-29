@@ -9,7 +9,7 @@ int main(int argc, char **argv) {
     Robot robot(argv[1]);
     robot.SetLogFileName("MyRobot.log");
 
-    JointSliders js(&robot);
+    JointSliders js(&robot, 1); // with logging
 
     Graphic G(&robot, "MyRobot");
     G.SetGraphicScaling(0.15);

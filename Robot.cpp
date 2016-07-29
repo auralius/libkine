@@ -215,6 +215,8 @@ void Robot::DoVerbosity()
         }
     }
     m_LoggingStream << endl;
+    
+    cout << p[0] << '\t' << p[1] << '\t' << p[2] << endl;
 
 }
 
