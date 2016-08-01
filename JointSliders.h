@@ -10,12 +10,10 @@
 #include <FL/Fl_Slider.H>
 #include <stdio.h>
 
-#include<arpa/inet.h>
-#include<sys/socket.h>
-
 #include <sstream>
 #include <vector>
 
+#include "PracticalSocket.h"
 #include "Robot.h"
 
 using namespace std;

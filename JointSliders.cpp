@@ -65,36 +65,21 @@ void JointSliders::UDPReceiverWorker() {
     size_t n = m_Robot->GetLinks().size();
     double data[n];
     
-    int sockfd;
-    sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &n, sizeof(n)) == -1) 
-        cerr << "error: setsockopt\n";
+    UDPSocket sockfd(12345);
     
-    struct sockaddr_in serv, client;
-    
-    bzero(&serv, sizeof(serv));
-    serv.sin_family = AF_INET;
-    serv.sin_port = htons(12345);
-    serv.sin_addr.s_addr = htonl(INADDR_ANY);
-    
-    if (bind(sockfd, (struct sockaddr* ) &serv, sizeof(serv)) == -1) 
-        cerr << "error: bind\n";
-        
-    socklen_t l = sizeof(client);
-
     cout << "\nListening in port 12345...\n";
     cout.flush();
     
+    string sourceAddress;             // Address of datagram source
+    unsigned short sourcePort;        // Port of datagram source
+    
     while (m_Running) {
-        int rc = recvfrom(sockfd, (char *)&data, 8*n, 0, (struct sockaddr *)&client, &l);
+        int rc = sockfd.recvFrom((char *)&data, 8*n, sourceAddress, sourcePort);
         
-        if (rc < 0) 
-            cerr << "error: recvfrom\n";
-        else {
-            for (size_t i = 0; i < n; i++) 
-                m_Robot->ActuateJoint((int) i, data[i]);
-            m_Robot->Update(m_Verbose);
-        } // else
+        for (size_t i = 0; i < n; i++) 
+            m_Robot->ActuateJoint((int) i, data[i]);
+        
+        m_Robot->Update(m_Verbose);        
     } //while (m_Running)        
 }
 

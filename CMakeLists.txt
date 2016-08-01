@@ -10,7 +10,7 @@ include(${VTK_USE_FILE})
 find_package(FLTK REQUIRED)
 find_package(OpenGL REQUIRED)
 
-add_executable(libkine main.cpp Link.cpp Link.h Robot.cpp Robot.h Graphic.cpp Graphic.h JointSliders.cpp JointSliders.h)
+add_executable(libkine main.cpp Link.cpp Link.h Robot.cpp Robot.h Graphic.cpp Graphic.h JointSliders.cpp JointSliders.h PracticalSocket.cpp PracticalSocket.h)
 
 if (VTK_LIBRARIES)
     target_link_libraries(libkine ${VTK_LIBRARIES})
