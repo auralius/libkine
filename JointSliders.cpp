@@ -6,6 +6,7 @@
 
 
 JointSliders::JointSliders(Robot *robot, int verbose) {
+    m_Running = 1;
     m_Robot = robot;
     m_Verbose = verbose;
 
@@ -34,8 +35,9 @@ JointSliders::JointSliders(Robot *robot, int verbose) {
 
     m_Win->show();
 
-    pthread_t thread;
-    pthread_create(&thread, NULL, Run, (void *) this);
+    pthread_t thread1, thread2;
+    pthread_create(&thread1, NULL, UDPReceiver, (void *) this);
+    pthread_create(&thread2, NULL, Run, (void *) this);    
 }
 
 JointSliders::~JointSliders() {
@@ -55,6 +57,47 @@ void JointSliders::SliderCBWorker() {
     m_Robot->Update(m_Verbose);
 }
 
+void *JointSliders::UDPReceiver(void *data) {
+    ((JointSliders *) data)->UDPReceiverWorker();
+}
+
+void JointSliders::UDPReceiverWorker() {
+    size_t n = m_Robot->GetLinks().size();
+    double data[n];
+    
+    int sockfd;
+    sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &n, sizeof(n)) == -1) 
+        cerr << "error: setsockopt\n";
+    
+    struct sockaddr_in serv, client;
+    
+    bzero(&serv, sizeof(serv));
+    serv.sin_family = AF_INET;
+    serv.sin_port = htons(12345);
+    serv.sin_addr.s_addr = htonl(INADDR_ANY);
+    
+    if (bind(sockfd, (struct sockaddr* ) &serv, sizeof(serv)) == -1) 
+        cerr << "error: bind\n";
+        
+    socklen_t l = sizeof(client);
+
+    cout << "\nListening in port 12345...\n";
+    cout.flush();
+    
+    while (m_Running) {
+        int rc = recvfrom(sockfd, (char *)&data, 8*n, 0, (struct sockaddr *)&client, &l);
+        
+        if (rc < 0) 
+            cerr << "error: recvfrom\n";
+        else {
+            for (size_t i = 0; i < n; i++) 
+                m_Robot->ActuateJoint((int) i, data[i]);
+            m_Robot->Update(m_Verbose);
+        } // else
+    } //while (m_Running)        
+}
+
 Fl_Window *JointSliders::GetWindow() {
     return m_Win;
 }
@@ -68,6 +111,8 @@ void *JointSliders::RunWorker() {
 }
 
 void JointSliders::End() {
+    m_Running = 0;
+    
     for (int i = 0; i < m_Sliders.size(); i ++) {
         Fl_Slider *slider = m_Sliders.at(i);
         delete [] slider->label();

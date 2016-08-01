@@ -10,6 +10,9 @@
 #include <FL/Fl_Slider.H>
 #include <stdio.h>
 
+#include<arpa/inet.h>
+#include<sys/socket.h>
+
 #include <sstream>
 #include <vector>
 
@@ -32,10 +35,14 @@ private:
 
     static void SliderCB(Fl_Widget *w, void *data);
     void SliderCBWorker();
+    
+    static void *UDPReceiver(void *data);
+    void UDPReceiverWorker();
 
     Fl_Window *m_Win;
     vector <Fl_Slider *> m_Sliders;
 
+    int m_Running;
     Robot *m_Robot;
     int m_Verbose;
 };
