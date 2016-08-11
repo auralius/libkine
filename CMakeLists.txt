@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(libkine)
+project(LIBKINE)
 
 add_definitions(-std=c++11) 
 
@@ -10,14 +10,17 @@ include(${VTK_USE_FILE})
 find_package(FLTK REQUIRED)
 find_package(OpenGL REQUIRED)
 
-add_executable(libkine main.cpp Link.cpp Link.h Robot.cpp Robot.h Graphic.cpp Graphic.h JointSliders.cpp JointSliders.h PracticalSocket.cpp PracticalSocket.h)
+add_library(kine Link.cpp Link.h Robot.cpp Robot.h Graphic.cpp Graphic.h JointSliders.cpp JointSliders.h PracticalSocket.cpp PracticalSocket.h)
+target_include_directories (kine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (VTK_LIBRARIES)
-    target_link_libraries(libkine ${VTK_LIBRARIES})
+    target_link_libraries(kine ${VTK_LIBRARIES})
 else ()
-    target_link_libraries(libkine vtkHybrid vtkWidgets)
+    target_link_libraries(kine vtkHybrid vtkWidgets)
 endif ()
 
-install(TARGETS libkine RUNTIME DESTINATION bin)
+add_executable(demo1 main.cpp)
 
-target_link_libraries(libkine pthread armadillo ${FLTK_LIBRARIES} ${OPENGL_LIBRARIES})
+install(TARGETS demo1 RUNTIME DESTINATION bin)
+
+target_link_libraries(demo1 LINK_PUBLIC kine pthread armadillo ${FLTK_LIBRARIES} ${OPENGL_LIBRARIES})
