@@ -54,20 +54,20 @@ private:
     void ArmaMatToVTKMat(vtkSmartPointer<vtkMatrix4x4> &to, mat &from);
 
 public:
-    // Vector of pointers of the actors for the RGB 3D coordinate axes
-    vector<vtkSmartPointer<vtkAxesActor> > *m_AxesActors;
-
-    // Vector of pointer of the lines that connect one joint to the next joint
-    vector<vtkSmartPointer<vtkLineSource> > *m_LineSources;
-
-    // Vector of pointers of the actors for the STL files
-    vector<vtkSmartPointer<vtkActor> > *m_STLActors;
+    // Vector for all robots
+    vector<Robot *> *m_RobotList;
     
-    // Vector of pointers of the actors for the boundary edges
-    vector<vtkSmartPointer<vtkActor> > *m_EdgeActors;
-
-    // Pointer to the robot
-    Robot *m_Robot;
+    //
+    // Vector to hold the actors for the 3D axes and the STL files
+    //
+    vector<vector<vtkSmartPointer<vtkAxesActor> > > *m_AxesActorsList;
+    vector<vector<vtkSmartPointer<vtkActor> > > *m_STLActorsList;
+    
+    // Vector to hold the created lines
+    vector<vector<vtkSmartPointer<vtkLineSource> > > *m_LineSourcesList; 
+    
+    // Vector to hold the boundary edges
+    vector<vector<vtkSmartPointer<vtkActor> > > *m_EdgeActorsList; 
 };
 
 /*---------------------------------------------------------------------*/
@@ -75,9 +75,11 @@ public:
 class Graphic {
 public:
     // Create the graphic window
-    Graphic(Robot *robot, const char *window_title);
+    Graphic(const char *window_title);
 
     ~Graphic();
+    
+    void AddRobot(Robot *robot);
 
     // Define the scaling for drawing the 3D coordinate axes
     void SetGraphicScaling(double K);
@@ -110,7 +112,7 @@ private:
     void Rgb(char c, double color[3]);
 
     // Pointer to the robot
-    Robot *m_Robot;
+    //Robot *m_Robot;
 
     // the scaling factor for the 3D axes
     double m_K;
@@ -134,19 +136,21 @@ private:
     vtkRenderer *m_RenSTL;
     vtkRenderWindow *m_RenWin;
     vtkRenderWindowInteractor *m_Iren;
-
+    
+    // Vector for all robots
+    vector<Robot *>m_RobotList;
+    
     //
     // Vector to hold the actors for the 3D axes and the STL files
     //
-    vector<vtkSmartPointer<vtkAxesActor> > m_AxesActors;
-    vector<vtkSmartPointer<vtkActor> > m_STLActors;
-
+    vector<vector<vtkSmartPointer<vtkAxesActor> > > m_AxesActorsList;
+    vector<vector<vtkSmartPointer<vtkActor> > > m_STLActorsList;
+    
     // Vector to hold the created lines
-    vector<vtkSmartPointer<vtkLineSource> > m_LineSources;
+    vector<vector<vtkSmartPointer<vtkLineSource> > > m_LineSourcesList; 
     
     // Vector to hold the boundary edges
-    vector<vtkSmartPointer<vtkActor> > m_EdgeActors;
-    
+    vector<vector<vtkSmartPointer<vtkActor> > > m_EdgeActorsList;   
 };
 
 

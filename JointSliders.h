@@ -20,7 +20,7 @@ using namespace std;
 
 class JointSliders {
 public:
-    JointSliders(Robot *robot, int verbose = 0);
+    JointSliders(vector<Robot *> *robot, int verbose = 0);
     ~JointSliders();
 
     void End();
@@ -41,8 +41,10 @@ private:
     vector <Fl_Slider *> m_Sliders;
 
     int m_Running;
-    Robot *m_Robot;
+    vector <Robot *> *m_Robots;
     int m_Verbose;
+    
+    int m_DataSize;
 };
 
 

@@ -13,59 +13,68 @@ vtkTimerCallback *vtkTimerCallback::New() {
 
 void vtkTimerCallback::Execute(vtkObject *caller, unsigned long eventId, 
                                void *vtkNotUsed(callData)) {
-    vector<Link *> links = m_Robot->GetLinks();
-    vtkSmartPointer<vtkMatrix4x4> vtk_A_tip = 
-        vtkSmartPointer<vtkMatrix4x4>::New();
-    vtkSmartPointer<vtkMatrix4x4> vtk_A_joint = 
-        vtkSmartPointer<vtkMatrix4x4>::New();
-    mat A_tip;
-    mat A_joint;
+    
+    for (size_t h = 0;  h < m_RobotList->size(); h++) {
+        Robot *robot = m_RobotList->at(h);
+        vector<vtkSmartPointer<vtkLineSource> > line_sources = m_LineSourcesList->at(h);
+        vector<vtkSmartPointer<vtkAxesActor> > axes_actors = m_AxesActorsList->at(h); 
+        vector<vtkSmartPointer<vtkActor> > stl_actors = m_STLActorsList->at(h);
+        vector<vtkSmartPointer<vtkActor> > edge_actors = m_EdgeActorsList->at(h);        
+            
+        vector<Link *> links = robot->GetLinks();
+        vtkSmartPointer<vtkMatrix4x4> vtk_A_tip = 
+            vtkSmartPointer<vtkMatrix4x4>::New();
+        vtkSmartPointer<vtkMatrix4x4> vtk_A_joint = 
+            vtkSmartPointer<vtkMatrix4x4>::New();
+        mat A_tip;
+        mat A_joint;
 
-    double p0[3] = { 0, 0, 0 };
-    double p1[3] = { 0, 0, 0 };
+        double p0[3] = { 0, 0, 0 };
+        double p1[3] = { 0, 0, 0 };
 
-    for (size_t i = 0; i < links.size(); i++) {
+        for (size_t i = 0; i < links.size(); i++) {
 
-        m_Robot->GetJointTransformation(i, A_joint);
-        m_Robot->GetTipTransformation(i, A_tip);
+            robot->GetJointTransformation(i, A_joint);
+            robot->GetTipTransformation(i, A_tip);
 
-        // Axes
-        // Armadillo matrix to VTK matrix
-        ArmaMatToVTKMat(vtk_A_tip, A_tip);
-        ArmaMatToVTKMat(vtk_A_joint, A_joint);
+            // Axes
+            // Armadillo matrix to VTK matrix
+            ArmaMatToVTKMat(vtk_A_tip, A_tip);
+            ArmaMatToVTKMat(vtk_A_joint, A_joint);
 
-        vtkSmartPointer<vtkTransform> transform_tip = 
-            vtkSmartPointer<vtkTransform>::New();
-        transform_tip->PostMultiply();
-        transform_tip->SetMatrix(vtk_A_tip);
-
-        m_AxesActors->at(i)->SetUserTransform(transform_tip);
-
-        // Lines
-        m_Robot->GetJointPosition(i, p0);
-        m_Robot->GetTipPosition(i, p1);
-
-        vtkLineSource *ls = m_LineSources->at(i);
-        ls->SetPoint1(p0);
-        ls->SetPoint2(p1);
-        ls->Update();
-
-        // STL
-        if (links.at(i)->GetSTLFileName()) {
-            vtkSmartPointer<vtkTransform> transform_joint = 
+            vtkSmartPointer<vtkTransform> transform_tip = 
                 vtkSmartPointer<vtkTransform>::New();
-            transform_joint->PostMultiply();
-            transform_joint->SetMatrix(vtk_A_tip);
+            transform_tip->PostMultiply();
+            transform_tip->SetMatrix(vtk_A_tip);
 
-            // Index zero is for the base, so we use i+1
-            m_STLActors->at(i+1)->SetUserTransform(transform_joint);
-            m_EdgeActors->at(i+1)->SetUserTransform(transform_joint);              
+            axes_actors.at(i)->SetUserTransform(transform_tip);
 
-            // Move the robot base to the desired base position
-            if (i == 0 && m_STLActors->at(i)) {
-                m_STLActors->at(i)->SetPosition(p0);
-                m_EdgeActors->at(i)->SetPosition(p0);
+            // Lines
+            robot->GetJointPosition(i, p0);
+            robot->GetTipPosition(i, p1);
+
+            vtkLineSource *ls = line_sources.at(i);
+            ls->SetPoint1(p0);
+            ls->SetPoint2(p1);
+            ls->Update();
+
+            // STL
+            if (links.at(i)->GetSTLFileName())  {
+                vtkSmartPointer<vtkTransform> transform_joint = 
+                    vtkSmartPointer<vtkTransform>::New();
+                transform_joint->PostMultiply();
+                transform_joint->SetMatrix(vtk_A_tip);
+
+                // Index zero is for the base, so we use i+1
+                stl_actors.at(i)->SetUserTransform(transform_joint);
+                edge_actors.at(i)->SetUserTransform(transform_joint);                              
             }
+            
+            // Move the robot base to the desired base position
+/*            if (i == 0 && stl_actors.at(i)) {
+                stl_actors.at(i)->SetPosition(p0);
+                edge_actors.at(i)->SetPosition(p0);
+            }*/
         }
     }
 
@@ -84,10 +93,9 @@ void vtkTimerCallback::ArmaMatToVTKMat(vtkSmartPointer<vtkMatrix4x4> &to,
 
 /*---------------------------------------------------------------------------*/
 
-Graphic::Graphic(Robot *robot, const char *window_title) {
+Graphic::Graphic(const char *window_title) {
     m_CamDist = 3;
     m_K = 0.05;
-    m_Robot = robot;
     m_STLVisibility = 1;
     m_Opacity = 1;
     m_WindowTitle = window_title;
@@ -122,11 +130,16 @@ Graphic::~Graphic() {
     m_Iren->Delete();
 }
 
+void Graphic::AddRobot(Robot *robot)
+{
+    m_RobotList.push_back(robot);
+}
+
 void Graphic::Run() {
     CreateAxes();
     CreateLinks();
-    RenderBase();
     CreateSTLs();
+    RenderBase();
 
     // Initialize must be called prior to creating timer events.
     m_Iren->Initialize();
@@ -135,11 +148,11 @@ void Graphic::Run() {
     vtkSmartPointer<vtkTimerCallback> cb = 
         vtkSmartPointer<vtkTimerCallback>::New();
 
-    cb->m_AxesActors = &m_AxesActors;
-    cb->m_EdgeActors = &m_EdgeActors;
-    cb->m_LineSources = &m_LineSources;
-    cb->m_STLActors = &m_STLActors;
-    cb->m_Robot = m_Robot;
+    cb->m_AxesActorsList = &m_AxesActorsList;
+    cb->m_EdgeActorsList = &m_EdgeActorsList;
+    cb->m_LineSourcesList = &m_LineSourcesList;
+    cb->m_STLActorsList = &m_STLActorsList;
+    cb->m_RobotList = &m_RobotList;
 
     m_Iren->AddObserver(vtkCommand::TimerEvent, cb);
 
@@ -182,65 +195,149 @@ void Graphic::SetCameraDistance(double dist) {
 void Graphic::CreateAxes() {
     ostringstream o;
 
-    for (size_t i = 0; i < m_Robot->GetLinks().size(); i++) {
-        vtkSmartPointer<vtkAxesActor> axes = 
-            vtkSmartPointer<vtkAxesActor>::New();
-        m_AxesActors.push_back(axes);
-        //axes->AxisLabelsOff();        
-        axes->SetTotalLength(m_K, m_K, m_K);
+    for (size_t h = 0;  h < m_RobotList.size(); h++) {
+        Robot *robot = m_RobotList.at(h);
+        
+        vector<vtkSmartPointer<vtkAxesActor> > axes_actors;
+        
+        for (size_t i = 0; i < robot->GetLinks().size(); i++) {
+            vtkSmartPointer<vtkAxesActor> axes = 
+                vtkSmartPointer<vtkAxesActor>::New();
+            axes_actors.push_back(axes);
+            
+            //axes->AxisLabelsOff();        
+            axes->SetTotalLength(m_K, m_K, m_K);
 
-        vtkSmartPointer<vtkTextProperty> tprop = 
-            vtkSmartPointer<vtkTextProperty>::New();
-        tprop->SetFontFamilyToTimes();
-        axes->GetXAxisCaptionActor2D()->SetCaptionTextProperty(tprop);
-        axes->GetYAxisCaptionActor2D()->SetCaptionTextProperty(tprop);
-        axes->GetZAxisCaptionActor2D()->SetCaptionTextProperty(tprop);
+            vtkSmartPointer<vtkTextProperty> tprop = 
+                vtkSmartPointer<vtkTextProperty>::New();
+            tprop->SetFontFamilyToTimes();
+            axes->GetXAxisCaptionActor2D()->SetCaptionTextProperty(tprop);
+            axes->GetYAxisCaptionActor2D()->SetCaptionTextProperty(tprop);
+            axes->GetZAxisCaptionActor2D()->SetCaptionTextProperty(tprop);
 
-        axes->GetXAxisCaptionActor2D()->GetTextActor()->SetTextScaleMode(m_K);
-        axes->GetYAxisCaptionActor2D()->GetTextActor()->SetTextScaleMode(m_K);
-        axes->GetZAxisCaptionActor2D()->GetTextActor()->SetTextScaleMode(m_K);
+            axes->GetXAxisCaptionActor2D()->GetTextActor()->SetTextScaleMode(m_K);
+            axes->GetYAxisCaptionActor2D()->GetTextActor()->SetTextScaleMode(m_K);
+            axes->GetZAxisCaptionActor2D()->GetTextActor()->SetTextScaleMode(m_K);
 
-        o.str("");
-        o << "x" << i;
-        axes->SetXAxisLabelText(o.str().c_str());
+            o.str("");
+            o << "x" << i;
+            axes->SetXAxisLabelText(o.str().c_str());
 
-        o.str("");  
-        o << "y" << i;
-        axes->SetYAxisLabelText(o.str().c_str());
+            o.str("");  
+            o << "y" << i;
+            axes->SetYAxisLabelText(o.str().c_str());
 
-        o.str("");
-        o << "z" << i;
-        axes->SetZAxisLabelText(o.str().c_str());
+            o.str("");
+            o << "z" << i;
+            axes->SetZAxisLabelText(o.str().c_str());
 
-        m_Ren->AddActor(axes);
+            m_Ren->AddActor(axes);
+        }   
+        
+        m_AxesActorsList.push_back(axes_actors);
     }
 }
 
 void Graphic::CreateLinks() {
-    for (size_t i = 0; i < m_Robot->GetLinks().size(); i++) {
-        vtkSmartPointer<vtkLineSource> ls = 
-            vtkSmartPointer<vtkLineSource>::New();
-        m_LineSources.push_back(ls);
+    for (size_t h = 0;  h < m_RobotList.size(); h++) {
+        Robot *robot = m_RobotList.at(h);
+        
+        vector<vtkSmartPointer<vtkLineSource> > line_sources;
+        
+        for (size_t i = 0; i < robot->GetLinks().size(); i++) {
+            vtkSmartPointer<vtkLineSource> ls = 
+                vtkSmartPointer<vtkLineSource>::New();
+            line_sources.push_back(ls);
 
-        // Visualize
-        vtkSmartPointer<vtkPolyDataMapper> mapper = 
-            vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(ls->GetOutputPort());
+            // Visualize
+            vtkSmartPointer<vtkPolyDataMapper> mapper = 
+                vtkSmartPointer<vtkPolyDataMapper>::New();
+            mapper->SetInputConnection(ls->GetOutputPort());
 
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-        actor->GetProperty()->SetLineWidth(1);
-        actor->GetProperty()->SetColor(1.0, 0.0, 1.0);
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            actor->GetProperty()->SetLineWidth(1);
+            actor->GetProperty()->SetColor(1.0, 0.0, 1.0);
 
-        m_Ren->AddActor(actor);
+            m_Ren->AddActor(actor);
+        }
+        
+        m_LineSourcesList.push_back(line_sources);
     }
 }
 
 void Graphic::CreateSTLs() {
-    for (size_t i = 0; i < m_Robot->GetLinks().size(); i++) {
-        Link *l = m_Robot->GetLinks().at(i);
-        const char *fn = l->GetSTLFileName();
+    for (size_t h = 0;  h < m_RobotList.size(); h++) {
+        Robot *robot = m_RobotList.at(h);
+        
+        vector<vtkSmartPointer<vtkActor> > stl_actors;
+        vector<vtkSmartPointer<vtkActor> > edge_actors;
+        
+        for (size_t i = 0; i < robot->GetLinks().size(); i++) {
+            Link *l = robot->GetLinks().at(i);
+            const char *fn = l->GetSTLFileName();
 
+            if (fn) {
+                vtkSmartPointer<vtkSTLReader> reader = 
+                    vtkSmartPointer<vtkSTLReader>::New();
+                reader->SetFileName(fn);
+                reader->Update();
+                
+                // Edges
+                vtkSmartPointer<vtkFeatureEdges> feature_edges =
+                    vtkSmartPointer<vtkFeatureEdges>::New();
+                feature_edges->SetInputConnection(reader->GetOutputPort());
+                feature_edges->Update();
+                
+                // Visualize the edges
+                vtkSmartPointer<vtkPolyDataMapper> edge_mapper = 
+                    vtkSmartPointer<vtkPolyDataMapper>::New();
+                edge_mapper->SetInputConnection(feature_edges->GetOutputPort());
+                vtkSmartPointer<vtkActor> edge_actor =  vtkSmartPointer<vtkActor>::New();
+                edge_actor->SetMapper(edge_mapper);
+                edge_actor->GetProperty()->SetLineWidth(4);
+                edge_actor->GetProperty()->SetEdgeColor(0,0,0);
+                edge_actor->GetProperty()->EdgeVisibilityOn();
+
+                // Visualize the STLs
+                vtkSmartPointer<vtkPolyDataMapper> stl_mapper = 
+                    vtkSmartPointer<vtkPolyDataMapper>::New();
+                stl_mapper->SetInputConnection(reader->GetOutputPort());
+
+                vtkSmartPointer<vtkActor> stl_actor = vtkSmartPointer<vtkActor>::New();
+                stl_actor->SetMapper(stl_mapper);
+                stl_actor->SetVisibility(m_STLVisibility);
+                stl_actor->GetProperty()->SetOpacity(m_Opacity);
+
+                char c = l->GetColor();
+                double color[3];
+                Rgb(c, color);
+                stl_actor->GetProperty()->SetColor(color);
+
+                //
+                m_RenSTL->AddActor(stl_actor);
+                m_RenSTL->AddActor(edge_actor);
+
+                stl_actors.push_back(stl_actor);
+                edge_actors.push_back(edge_actor);
+            }
+            else {
+                stl_actors.push_back(NULL);
+                edge_actors.push_back(NULL);
+            }
+        }
+        
+        m_STLActorsList.push_back(stl_actors);
+        m_EdgeActorsList.push_back(edge_actors);
+    }
+}
+
+void Graphic::RenderBase()
+{
+    for (size_t h = 0;  h < m_RobotList.size(); h++) {
+        Robot *robot = m_RobotList.at(h);
+        
+        const char *fn = robot->GetBaseSTLFileName();
         if (fn) {
             vtkSmartPointer<vtkSTLReader> reader = 
                 vtkSmartPointer<vtkSTLReader>::New();
@@ -264,91 +361,38 @@ void Graphic::CreateSTLs() {
             edge_actor->GetProperty()->SetEdgeColor(0,0,0);
             edge_actor->GetProperty()->EdgeVisibilityOn();
 
-            // Visualize the STLs
+            // Visualize th STLs
             vtkSmartPointer<vtkPolyDataMapper> stl_mapper = 
                 vtkSmartPointer<vtkPolyDataMapper>::New();
             stl_mapper->SetInputConnection(reader->GetOutputPort());
 
-            vtkSmartPointer<vtkActor> stl_actor = vtkSmartPointer<vtkActor>::New();
+            vtkSmartPointer<vtkActor> stl_actor = 
+                vtkSmartPointer<vtkActor>::New();
             stl_actor->SetMapper(stl_mapper);
             stl_actor->SetVisibility(m_STLVisibility);
             stl_actor->GetProperty()->SetOpacity(m_Opacity);
 
-            char c = l->GetColor();
+            double p[3];
+            robot->GetBasePosition(p);
+            stl_actor->SetPosition(p);
+            edge_actor->SetPosition(p);
+            
             double color[3];
-            Rgb(c, color);
-            stl_actor->GetProperty()->SetColor(color);
+            Rgb('w', color);
+            stl_actor->GetProperty()->SetColor(color); // White color for the base
 
             //
             m_RenSTL->AddActor(stl_actor);
             m_RenSTL->AddActor(edge_actor);
 
-            m_STLActors.push_back(stl_actor);
-            m_EdgeActors.push_back(edge_actor);
+            m_STLActorsList.at(h).push_back(stl_actor);
+            m_EdgeActorsList.at(h).push_back(edge_actor);
+            
         }
         else {
-            m_STLActors.push_back(NULL);
-            m_EdgeActors.push_back(NULL);
+            m_STLActorsList.at(h).push_back(NULL);
+            m_EdgeActorsList.at(h).push_back(NULL);
         }
-    }
-}
-
-void Graphic::RenderBase()
-{
-    const char *fn = m_Robot->GetBaseSTLFileName();
-    if (fn) {
-        vtkSmartPointer<vtkSTLReader> reader = 
-            vtkSmartPointer<vtkSTLReader>::New();
-        reader->SetFileName(fn);
-        reader->Update();
-        
-        // Edges
-        vtkSmartPointer<vtkFeatureEdges> feature_edges =
-            vtkSmartPointer<vtkFeatureEdges>::New();
-        feature_edges->SetInputConnection(reader->GetOutputPort());
-        feature_edges->Update();
-        
-        // Visualize the edges
-        vtkSmartPointer<vtkPolyDataMapper> edge_mapper = 
-            vtkSmartPointer<vtkPolyDataMapper>::New();
-        edge_mapper->SetInputConnection(feature_edges->GetOutputPort());
-        vtkSmartPointer<vtkActor> edge_actor =
-            vtkSmartPointer<vtkActor>::New();
-        edge_actor->SetMapper(edge_mapper);
-        edge_actor->GetProperty()->SetLineWidth(4);
-        edge_actor->GetProperty()->SetEdgeColor(0,0,0);
-        edge_actor->GetProperty()->EdgeVisibilityOn();
-
-        // Visualize th STLs
-        vtkSmartPointer<vtkPolyDataMapper> stl_mapper = 
-            vtkSmartPointer<vtkPolyDataMapper>::New();
-        stl_mapper->SetInputConnection(reader->GetOutputPort());
-
-        vtkSmartPointer<vtkActor> stl_actor = 
-            vtkSmartPointer<vtkActor>::New();
-        stl_actor->SetMapper(stl_mapper);
-        stl_actor->SetVisibility(m_STLVisibility);
-        stl_actor->GetProperty()->SetOpacity(m_Opacity);
-
-        double p[3];
-        m_Robot->GetBasePosition(p);
-        stl_actor->SetPosition(p);
-        edge_actor->SetPosition(p);
-        
-        double color[3];
-        Rgb('w', color);
-        stl_actor->GetProperty()->SetColor(color); // White color for the base
-
-        //
-        m_RenSTL->AddActor(stl_actor);
-        m_RenSTL->AddActor(edge_actor);
-
-        m_STLActors.push_back(stl_actor);
-        m_EdgeActors.push_back(edge_actor);
-    }
-    else {
-        m_STLActors.push_back(NULL);
-        m_EdgeActors.push_back(NULL);
     }
 }
 
