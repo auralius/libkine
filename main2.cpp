@@ -1,13 +1,18 @@
+/*
+ * main2.m
+ * Load 2 robots, and display the joint sliders. 
+ * The robots are loaded externally from given arguments.
+ * The arguments point to the location of the configuration files of the robots.
+ */
+
 #include "Robot.h"
 #include "Graphic.h"
 #include "JointSliders.h"
 
 
 int main(int argc, char **argv) {
-
-    //Robot puma;
     Robot robot1(argv[1]);
-    Robot robot2(argv[1]);
+    Robot robot2(argv[2]);
     robot1.SetLogFileName("MyRobot1.log");
     robot2.SetLogFileName("MyRobot2.log");
     
@@ -30,5 +35,4 @@ int main(int argc, char **argv) {
     G.Run();  // Blocks here until VTK GUI is closed
 
     js.End();
-
 }

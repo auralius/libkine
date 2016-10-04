@@ -19,8 +19,11 @@ else ()
     target_link_libraries(kine vtkHybrid vtkWidgets)
 endif ()
 
-add_executable(demo1 main.cpp)
+add_executable(demo1 main1.cpp)
+add_executable(demo2 main2.cpp)
 
 install(TARGETS demo1 RUNTIME DESTINATION bin)
+install(TARGETS demo2 RUNTIME DESTINATION bin)
 
 target_link_libraries(demo1 LINK_PUBLIC kine pthread armadillo ${FLTK_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(demo2 LINK_PUBLIC kine pthread armadillo ${FLTK_LIBRARIES} ${OPENGL_LIBRARIES})

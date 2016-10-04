@@ -111,7 +111,6 @@ Graphic::Graphic(const char *window_title) {
     m_RenSTL->SetLayer(0);
     m_Ren->SetLayer(1);
 
-
     m_Iren = vtkRenderWindowInteractor::New();
     m_Iren->SetRenderWindow(m_RenWin);
 
@@ -185,8 +184,6 @@ void Graphic::SetSTLVisibility(int flag) {
 void Graphic::SetOpacity(double opacity) {
     m_Opacity = opacity;
 }
-
-
 
 void Graphic::SetCameraDistance(double dist) {
     m_CamDist = dist;
