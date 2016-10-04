@@ -17,6 +17,7 @@ Dependencies:
 
 1. VTK for visualization
 2. Armadillo for matrix calculation
+3. FLTK for the joint sider interface
 
 How to Install:
 ---
