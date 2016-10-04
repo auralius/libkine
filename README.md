@@ -29,7 +29,7 @@ How to Install:
 5. Create directory: mkdir build
 6. Go inside build, type: cmake ..
 7. Type: make
-8. Run: ./demo1 ../model/puma/puma.csv
+8. Run: ./demo1 or ./demo2 ../model/puma/puma.csv ../model/puma/puma.csv
 
 ---
 
