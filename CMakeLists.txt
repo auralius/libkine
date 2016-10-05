@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 project(LIBKINE)
 
-add_definitions(-std=c++11) 
-
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 
@@ -27,3 +25,5 @@ install(TARGETS demo2 RUNTIME DESTINATION bin)
 
 target_link_libraries(demo1 LINK_PUBLIC kine pthread armadillo ${FLTK_LIBRARIES} ${OPENGL_LIBRARIES})
 target_link_libraries(demo2 LINK_PUBLIC kine pthread armadillo ${FLTK_LIBRARIES} ${OPENGL_LIBRARIES})
+
+target_compile_options(kine PUBLIC -std=c++11 -fstack-protector-all)
