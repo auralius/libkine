@@ -67,4 +67,6 @@ int main(int argc, char **argv) {
 
     running = 0;
     pthread_join(thread, NULL);
+
+	return 0;
 }

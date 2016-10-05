@@ -10,44 +10,8 @@ JointSliders::JointSliders(vector<Robot *> *robots, int verbose) {
     m_Robots = robots;
     m_Verbose = verbose;
 
-    // How many joints we have?
-    m_DataSize = 0;
-    for (size_t i = 0; i < robots->size(); i ++) {
-        Robot *robot = robots->at(i);
-        m_DataSize = m_DataSize + robot->GetLinks().size();
-    }
-
-    // adapt the size to the number of the links
-    m_Win = new Fl_Window(360, 50 * m_DataSize);
-
-    int k = 0;
-    for (size_t h = 0; h < robots->size(); h ++) {
-        Robot *robot = robots->at(h);
-        size_t n = robot->GetLinks().size();
-        
-        for (size_t i = 0; i < n; i++) {
-
-            char *c = new char(10);
-            snprintf(c, 10, "Joint-%lu", i);
-            Fl_Slider *slider;
-            slider = new Fl_Slider(20, 25 + (40 * k), 300, 20, c);
-            k = k + 1;
-
-            slider->callback(SliderCB, (void *) this);
-
-            slider->bounds(robot->GetLinks().at(i)->GetMinJointLimit(),
-                        robot->GetLinks().at(i)->GetMaxJointLimit());
-
-            slider->type(1);
-            slider->value(0);
-            m_Sliders.push_back(slider);
-        }
-    }
-
-    m_Win->show();
-
     pthread_t thread1, thread2;
-    //pthread_create(&thread1, NULL, UDPReceiver, (void *) this);
+    pthread_create(&thread1, NULL, UDPReceiver, (void *) this);
     pthread_create(&thread2, NULL, Run, (void *) this);    
 }
 
@@ -77,10 +41,12 @@ void JointSliders::SliderCBWorker() {
 
 void *JointSliders::UDPReceiver(void *data) {
     ((JointSliders *) data)->UDPReceiverWorker();
+
+	return NULL;
 }
 
 void JointSliders::UDPReceiverWorker() {
-    double data[m_DataSize];
+    double data[20];
     
     UDPSocket sockfd(12345);
     
@@ -114,10 +80,50 @@ Fl_Window *JointSliders::GetWindow() {
 
 void *JointSliders::Run(void *data) {
     ((JointSliders *) data)->RunWorker();
+
+	return NULL;
 }
 
 void *JointSliders::RunWorker() {
+
+	// How many joints we have?
+	m_DataSize = 0;
+	for (size_t i = 0; i < m_Robots->size(); i++) {
+		Robot *robot = m_Robots->at(i);
+		m_DataSize = m_DataSize + robot->GetLinks().size();
+	}
+
+	// adapt the size to the number of the links
+	m_Win = new Fl_Window(360, 50 * m_DataSize);
+
+	int k = 0;
+	for (size_t h = 0; h < m_Robots->size(); h++) {
+		Robot *robot = m_Robots->at(h);
+		size_t n = robot->GetLinks().size();
+
+		for (size_t i = 0; i < n; i++) {
+
+			char *c = new char(10);
+			snprintf(c, 10, "Joint-%lu", i);
+			Fl_Slider *slider;
+			slider = new Fl_Slider(20, 25 + (40 * k), 300, 20, c);
+			k = k + 1;
+
+			slider->callback(SliderCB, (void *) this);
+
+			slider->bounds(robot->GetLinks().at(i)->GetMinJointLimit(),
+				robot->GetLinks().at(i)->GetMaxJointLimit());
+
+			slider->type(1);
+			slider->value(0);
+			m_Sliders.push_back(slider);
+		}
+	}
+
+	m_Win->show();
     Fl::run(); // Blocks here
+
+	return NULL;
 }
 
 void JointSliders::End() {
@@ -125,7 +131,7 @@ void JointSliders::End() {
     
     for (int i = 0; i < m_Sliders.size(); i ++) {
         Fl_Slider *slider = m_Sliders.at(i);
-        delete [] slider->label();
+        delete slider->label();
     }
 
     m_Win->end();

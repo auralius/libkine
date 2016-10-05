@@ -35,4 +35,6 @@ int main(int argc, char **argv) {
     G.Run();  // Blocks here until VTK GUI is closed
 
     js.End();
+
+	return 0;
 }
