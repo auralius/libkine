@@ -44,7 +44,8 @@ private:
     vector <Robot *> *m_Robots;
     int m_Verbose;
     
-    int m_DataSize;
+    int m_TotNumLinks;
+
 };
 
 

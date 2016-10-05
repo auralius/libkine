@@ -11,10 +11,10 @@ JointSliders::JointSliders(vector<Robot *> *robots, int verbose) {
     m_Verbose = verbose;
 
     // How many joints we have?
-    m_DataSize = 0;
+    m_TotNumLinks = 0;
     for (size_t i = 0; i < m_Robots->size(); i++) {
         Robot *robot = m_Robots->at(i);
-        m_DataSize = m_DataSize + robot->GetLinks().size();
+        m_TotNumLinks = m_TotNumLinks + robot->GetLinks().size();
     }
 
     pthread_t thread1, thread2;
@@ -24,8 +24,8 @@ JointSliders::JointSliders(vector<Robot *> *robots, int verbose) {
 
 JointSliders::~JointSliders() {
     // Window has been closed, now clean up!
-    if (m_Win)
-        delete m_Win;
+    //if (m_Win)
+    //    delete m_Win;
 }
 
 void JointSliders::SliderCB(Fl_Widget *w, void *data) {
@@ -54,7 +54,7 @@ void *JointSliders::UDPReceiver(void *data) {
 }
 
 void JointSliders::UDPReceiverWorker() {
-    double *data = new double[m_DataSize];
+    double *data = new double[m_TotNumLinks];
     
     UDPSocket sockfd(12345);
     
@@ -65,7 +65,7 @@ void JointSliders::UDPReceiverWorker() {
     unsigned short sourcePort;        // Port of datagram source
     
     while (m_Running) {
-        int rc = sockfd.recvFrom((char *)data, 8*m_DataSize, sourceAddress, sourcePort);
+        int rc = sockfd.recvFrom((char *)data, 8*m_TotNumLinks, sourceAddress, sourcePort);
         
         size_t k = 0;
         for (size_t h = 0; h < m_Robots->size(); h ++) {
@@ -96,7 +96,7 @@ void *JointSliders::Run(void *data) {
 
 void *JointSliders::RunWorker() {
     // adapt the size to the number of the links
-    m_Win = new Fl_Window(360, 50 * m_DataSize);
+    m_Win = new Fl_Window(360, 50 * m_TotNumLinks);
 
     int k = 0;
     for (size_t h = 0; h < m_Robots->size(); h++) {
