@@ -36,6 +36,5 @@ int main(int argc, char **argv) {
 
     js.End();
 
-    Sleep(5000);
     return 0;
 }

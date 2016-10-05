@@ -19,7 +19,6 @@ Robot::Robot(const char *fn) {
     int line_num = 0;
     
     while (!file.eof()) {
-        cout << file.eof();
         while (1) {
             getline(file, line);
             

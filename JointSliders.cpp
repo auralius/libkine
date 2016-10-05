@@ -59,7 +59,7 @@ void JointSliders::UDPReceiverWorker() {
     UDPSocket sockfd(12345);
     
     cout << "\nListening in port 12345...\n";
-    cout.flush();
+    cout << flush;
     
     string sourceAddress;             // Address of datagram source
     unsigned short sourcePort;        // Port of datagram source
