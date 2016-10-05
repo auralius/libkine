@@ -10,6 +10,13 @@ JointSliders::JointSliders(vector<Robot *> *robots, int verbose) {
     m_Robots = robots;
     m_Verbose = verbose;
 
+    // How many joints we have?
+    m_DataSize = 0;
+    for (size_t i = 0; i < m_Robots->size(); i++) {
+        Robot *robot = m_Robots->at(i);
+        m_DataSize = m_DataSize + robot->GetLinks().size();
+    }
+
     pthread_t thread1, thread2;
     pthread_create(&thread1, NULL, UDPReceiver, (void *) this);
     pthread_create(&thread2, NULL, Run, (void *) this);    
@@ -17,7 +24,8 @@ JointSliders::JointSliders(vector<Robot *> *robots, int verbose) {
 
 JointSliders::~JointSliders() {
     // Window has been closed, now clean up!
-    delete m_Win;
+    if (m_Win)
+        delete m_Win;
 }
 
 void JointSliders::SliderCB(Fl_Widget *w, void *data) {
@@ -87,14 +95,6 @@ void *JointSliders::Run(void *data) {
 }
 
 void *JointSliders::RunWorker() {
-
-    // How many joints we have?
-    m_DataSize = 0;
-    for (size_t i = 0; i < m_Robots->size(); i++) {
-        Robot *robot = m_Robots->at(i);
-        m_DataSize = m_DataSize + robot->GetLinks().size();
-    }
-
     // adapt the size to the number of the links
     m_Win = new Fl_Window(360, 50 * m_DataSize);
 
@@ -133,7 +133,7 @@ void JointSliders::End() {
     
     for (int i = 0; i < m_Sliders.size(); i ++) {
         Fl_Slider *slider = m_Sliders.at(i);
-        delete slider->label();
+        delete [] slider->label();
     }
 
     m_Win->end();
