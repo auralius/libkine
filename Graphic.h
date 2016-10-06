@@ -33,10 +33,6 @@ VTK_MODULE_INIT(vtkRenderingFreeType);
 #include <vtkFeatureEdges.h>
 #include <vtkRenderWindowInteractor.h>
 
-#include <vtkDataSetMapper.h>
-#include <vtkDoubleArray.h>
-#include <vtkRectilinearGrid.h>
-
 #include "Robot.h"
 
 /*---------------------------------------------------------------------*/
