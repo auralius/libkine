@@ -31,6 +31,11 @@ VTK_MODULE_INIT(vtkRenderingFreeType);
 #include <vtkCaptionActor2D.h>
 #include <vtkSTLReader.h>
 #include <vtkFeatureEdges.h>
+#include <vtkRenderWindowInteractor.h>
+
+#include <vtkDataSetMapper.h>
+#include <vtkDoubleArray.h>
+#include <vtkRectilinearGrid.h>
 
 #include "Robot.h"
 
@@ -108,6 +113,9 @@ private:
 
     // Another STL file can be provided for the base of the robot
     void RenderBase();
+    
+    
+    void RenderGridFloor(double grid_dimension, double step);
 
     void Rgb(char c, double color[3]);
 

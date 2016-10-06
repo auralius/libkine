@@ -133,6 +133,7 @@ void Graphic::Run() {
     CreateLinks();
     CreateSTLs();
     RenderBase();
+    RenderGridFloor(5, 0.5);
 
     // Initialize must be called prior to creating timer events.
     m_Iren->Initialize();
@@ -385,6 +386,54 @@ void Graphic::RenderBase()
             m_EdgeActorsList.at(h).push_back(NULL);
         }
     }
+}
+
+void Graphic::RenderGridFloor(double grid_dimension, double step)
+{
+    const double HALF = grid_dimension/2.0;
+    
+    for (double i = 0.0; i <= grid_dimension; i = i + step) {
+        vtkSmartPointer<vtkLineSource> ls = 
+            vtkSmartPointer<vtkLineSource>::New();
+            
+        ls->SetPoint1(i - HALF, -HALF, 0);
+        ls->SetPoint2(i - HALF, HALF, 0);
+        ls->Update();
+
+        // Visualize
+        vtkSmartPointer<vtkPolyDataMapper> mapper = 
+            vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(ls->GetOutputPort());
+
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->GetProperty()->SetLineWidth(1);
+        actor->GetProperty()->SetColor(1.0, 1.0, 1.0); // White
+
+        m_Ren->AddActor(actor);
+    }
+    
+     for (double i = 0; i <= grid_dimension; i = i + step) {
+        vtkSmartPointer<vtkLineSource> ls = 
+            vtkSmartPointer<vtkLineSource>::New();
+            
+        ls->SetPoint1(-HALF, i - HALF, 0);
+        ls->SetPoint2(HALF, i - HALF, 0);
+        ls->Update();
+
+        // Visualize
+        vtkSmartPointer<vtkPolyDataMapper> mapper = 
+            vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(ls->GetOutputPort());
+
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->GetProperty()->SetLineWidth(1);
+        actor->GetProperty()->SetColor(1.0, 1.0, 1.0); // White
+
+        m_Ren->AddActor(actor);
+     }
+    
 }
 
 void Graphic::Rgb(char c, double color[3])
