@@ -411,7 +411,7 @@ void Graphic::RenderGridFloor(double grid_dimension, double step)
         actor->GetProperty()->SetLineWidth(1);
         actor->GetProperty()->SetColor(1.0, 1.0, 1.0); // White
 
-        m_Ren->AddActor(actor);
+        m_RenSTL->AddActor(actor);
     }
     
      for (double i = 0; i <= grid_dimension; i = i + step) {
@@ -432,7 +432,7 @@ void Graphic::RenderGridFloor(double grid_dimension, double step)
         actor->GetProperty()->SetLineWidth(1);
         actor->GetProperty()->SetColor(1.0, 1.0, 1.0); // White
 
-        m_Ren->AddActor(actor);
+        m_RenSTL->AddActor(actor);
      }
     
 }
