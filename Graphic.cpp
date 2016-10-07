@@ -134,6 +134,7 @@ void Graphic::Run() {
     CreateSTLs();
     RenderBase();
     RenderGridFloor(5, 0.5);
+    RenderGlobalAxis();
 
     // Initialize must be called prior to creating timer events.
     m_Iren->Initialize();
@@ -434,6 +435,27 @@ void Graphic::RenderGridFloor(double grid_dimension, double step)
         m_Ren->AddActor(actor);
      }
     
+}
+
+void Graphic::RenderGlobalAxis()
+{
+    vtkSmartPointer<vtkAxesActor> axis =
+        vtkSmartPointer<vtkAxesActor>::New();
+
+    axis->SetTotalLength(m_K, m_K, m_K);
+    axis->SetCylinderRadius(0.041);
+
+    axis->GetXAxisShaftProperty()->SetLineWidth(20);
+    axis->GetYAxisShaftProperty()->SetLineWidth(20);
+    axis->GetZAxisShaftProperty()->SetLineWidth(20);
+
+    axis->SetXAxisLabelText("x");
+    axis->SetYAxisLabelText("y");
+    axis->SetZAxisLabelText("z");
+
+    axis->SetPosition(0, 0, 0);
+
+    m_Ren->AddActor(axis);
 }
 
 void Graphic::Rgb(char c, double color[3])

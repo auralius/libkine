@@ -113,6 +113,8 @@ private:
     
     void RenderGridFloor(double grid_dimension, double step);
 
+    void RenderGlobalAxis();
+
     void Rgb(char c, double color[3]);
 
     // Pointer to the robot
