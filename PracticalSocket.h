@@ -20,6 +20,10 @@
 #ifndef __PRACTICALSOCKET_INCLUDED__
 #define __PRACTICALSOCKET_INCLUDED__
 
+#ifdef WIN32
+    #pragma warning( disable : 4290 )
+#endif
+
 #include <string>            // For string
 #include <exception>         // For exception class
 

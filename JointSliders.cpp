@@ -131,7 +131,7 @@ void *JointSliders::RunWorker() {
 void JointSliders::End() {
     m_Running = 0;
     
-    for (int i = 0; i < m_Sliders.size(); i ++) {
+    for (size_t  i = 0; i < m_Sliders.size(); i ++) {
         Fl_Slider *slider = m_Sliders.at(i);
         delete [] slider->label();
     }
