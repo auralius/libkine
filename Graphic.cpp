@@ -287,10 +287,14 @@ void Graphic::CreateSTLs() {
                     vtkSmartPointer<vtkPolyDataMapper>::New();
                 edge_mapper->SetInputConnection(feature_edges->GetOutputPort());
                 vtkSmartPointer<vtkActor> edge_actor =  vtkSmartPointer<vtkActor>::New();
+
+                edge_mapper->SetInputConnection(feature_edges->GetOutputPort());
+                edge_mapper->ScalarVisibilityOff();  
+
                 edge_actor->SetMapper(edge_mapper);
                 edge_actor->GetProperty()->SetLineWidth(4);
-                edge_actor->GetProperty()->SetEdgeColor(0,0,0);
-                edge_actor->GetProperty()->EdgeVisibilityOn();
+                edge_actor->GetProperty()->SetColor(0.0, 0.0, 0.0); // <- lines use SetColor
+                //edge_actor->GetProperty()->EdgeVisibilityOn();
 
                 // Visualize the STLs
                 vtkSmartPointer<vtkPolyDataMapper> stl_mapper = 
@@ -346,13 +350,16 @@ void Graphic::RenderBase()
             // Visualize the edges
             vtkSmartPointer<vtkPolyDataMapper> edge_mapper = 
                 vtkSmartPointer<vtkPolyDataMapper>::New();
-            edge_mapper->SetInputConnection(feature_edges->GetOutputPort());
+
             vtkSmartPointer<vtkActor> edge_actor =
                 vtkSmartPointer<vtkActor>::New();
+
+            edge_mapper->SetInputConnection(feature_edges->GetOutputPort());
+            edge_mapper->ScalarVisibilityOff();     
+
             edge_actor->SetMapper(edge_mapper);
             edge_actor->GetProperty()->SetLineWidth(4);
-            edge_actor->GetProperty()->SetEdgeColor(0,0,0);
-            edge_actor->GetProperty()->EdgeVisibilityOn();
+            edge_actor->GetProperty()->SetColor(0.0, 0.0, 0.0); // <- lines use SetColor
 
             // Visualize th STLs
             vtkSmartPointer<vtkPolyDataMapper> stl_mapper = 
@@ -438,20 +445,31 @@ void Graphic::RenderGridFloor(double grid_dimension, double step)
 }
 
 void Graphic::RenderGlobalAxis()
-{
+{   
     vtkSmartPointer<vtkAxesActor> axis =
         vtkSmartPointer<vtkAxesActor>::New();
+        
+    vtkSmartPointer<vtkTextProperty> tprop = 
+        vtkSmartPointer<vtkTextProperty>::New();
+    tprop->SetFontFamilyToTimes();
+
+    axis->GetXAxisCaptionActor2D()->SetCaptionTextProperty(tprop);
+    axis->GetYAxisCaptionActor2D()->SetCaptionTextProperty(tprop);
+    axis->GetZAxisCaptionActor2D()->SetCaptionTextProperty(tprop);
+
+    axis->GetXAxisCaptionActor2D()->GetTextActor()->SetTextScaleMode(m_K);
+    axis->GetYAxisCaptionActor2D()->GetTextActor()->SetTextScaleMode(m_K);
+    axis->GetZAxisCaptionActor2D()->GetTextActor()->SetTextScaleMode(m_K);
+
+    axis->SetXAxisLabelText("X");
+    axis->SetYAxisLabelText("Y");
+    axis->SetZAxisLabelText("Z");
 
     axis->SetTotalLength(m_K, m_K, m_K);
-    axis->SetCylinderRadius(0.041);
 
-    axis->GetXAxisShaftProperty()->SetLineWidth(20);
-    axis->GetYAxisShaftProperty()->SetLineWidth(20);
-    axis->GetZAxisShaftProperty()->SetLineWidth(20);
-
-    axis->SetXAxisLabelText("x");
-    axis->SetYAxisLabelText("y");
-    axis->SetZAxisLabelText("z");
+    axis->GetXAxisShaftProperty()->SetLineWidth(2);
+    axis->GetYAxisShaftProperty()->SetLineWidth(2);
+    axis->GetZAxisShaftProperty()->SetLineWidth(2);
 
     axis->SetPosition(0, 0, 0);
 
